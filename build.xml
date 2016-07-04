@@ -20,7 +20,7 @@
 		<mkdir dir="${build.jar_dir}" />
 		<jar destfile="${build.jar_fqn}" basedir="${build.classes_dir}">
 			<manifest>
-				<attribute name="Main-Class" value="sunseeker.telemetry.Main" />
+				<attribute name="Main-Class" value="sunseeker.telemetry.Telemetry" />
 			</manifest>
 		</jar>
 	</target>
