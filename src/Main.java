@@ -10,8 +10,6 @@
 package sunseeker.telemetry;
 
 
-import gnu.io.*;
-
 class Main {
 
 	public static void main(String[] args) {
@@ -20,7 +18,7 @@ class Main {
 		MainInterface mainIntf = new MainInterface();
 
 		//SerialHandler serialHandler   = new SerialHandler(serialComm, mainIntf, portIntf);
-		//SessionHandler sessionHandler = new SessionHandler(mainIntf);
+		
 
 		mainIntf.setSize(1000,750);
 		mainIntf.setVisible(true);

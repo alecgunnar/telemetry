@@ -18,7 +18,7 @@ import javax.swing.BorderFactory;
 import java.awt.Component;
 
 class DataInterface extends JPanel{
-
+/*
 	private ParseData dataIn;
 
 	//Data Fields
@@ -107,5 +107,5 @@ class DataInterface extends JPanel{
     private String reduce (double val) {
         return String.format("%.2f",val);
     }
-
+*/
 }

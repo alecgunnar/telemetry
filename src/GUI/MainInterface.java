@@ -20,7 +20,6 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -46,10 +45,6 @@ class MainInterface extends JFrame{
 	final public int HEIGHT = 750;
 	final public int PADDING = 10;
 
-	//Receiver
-	IReceiver data;
-	private double graphData;
-
 
 	MainInterface () {
 		contentPane = new JPanel();
@@ -57,7 +52,7 @@ class MainInterface extends JFrame{
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setTitle("Sunseeker Telemetry");
-        //this.getContentPane().setBackground(Color.BLACK);
+
         setLocation(500,0);
         setLayout(layout);
 
@@ -65,10 +60,7 @@ class MainInterface extends JFrame{
 
         createMenuBar();
 		createGraph();
-		createDataLabels();
 		createLog();
-
-		data = new DumbyReceiver();
 
 	}
 
@@ -88,37 +80,14 @@ class MainInterface extends JFrame{
 
 	public void createGraph () {
 
-		graphTabs = new JTabbedPane(JTabbedPane.TOP);
+		GraphInterface graph = new GraphInterface();
 
-		VoltageGraph volt = new VoltageGraph();
-		CurrentGraph amp = new CurrentGraph();
+		contentPane.add(graph);
 
-		graphTabs.addTab("Voltage", volt);
-		graphTabs.addTab("Current", amp);
+		graph.setPreferredSize(new Dimension(9500, 450));
 
-		contentPane.add(graphTabs);
-
-		graphTabs.setPreferredSize(new Dimension(800 ,500));
-
-		layout.putConstraint(SpringLayout.NORTH, graphTabs, PADDING, SpringLayout.SOUTH, menuBar);
-		fullWidthConstraint(graphTabs);
-	}
-
-	public void createDataLabels () {
-		dataPanel1 = new DataInterface();
-		dataPanel2 = new DataInterface();
-
-		dataLabels.setPreferredSize(new Dimension(200,300));
-
-
-
-		contentPane.add(dataLabels);
-
-		layout.putConstraint(SpringLayout.NORTH, dataPanel1, PADDING, SpringLayout.SOUTH, graphTabs);
-		layout.putConstraint(SpringLayout.WEST, dataPanel1, PADDING, SpringLayout.WEST, contentPane);
-		layout.putConstraint(SpringLayout.NORTH, dataPanel2, PADDING, SpringLayout.SOUTH, graphTabs);
-		layout.putConstraint(SpringLayout.WEST, dataPanel2, PADDING, SpringLayout.EAST, dataPanel2);
-
+		layout.putConstraint(SpringLayout.NORTH, graph, PADDING, SpringLayout.SOUTH, menuBar);
+		fullWidthConstraint(graph);
 	}
 
 	public void createLog () {
@@ -137,14 +106,6 @@ class MainInterface extends JFrame{
 	public void fullWidthConstraint (Component comp) {
 		layout.putConstraint(SpringLayout.WEST, comp, PADDING, SpringLayout.WEST, contentPane);
 		layout.putConstraint(SpringLayout.EAST, comp, PADDING * -1, SpringLayout.EAST, contentPane);
-	}
-
-	public int getFrameWidtht () {
-		return (int) this.getContentPane().getSize().getWidth();
-	}
-
-	public int getFrameHeight () {
-		return (int) this.getContentPane().getSize().getHeight();
 	}
 
 }
