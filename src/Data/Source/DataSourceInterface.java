@@ -13,4 +13,6 @@ interface DataSourceInterface extends Runnable {
     public String[] getTypes();
 
     public boolean provides(String type);
+
+    public String getName();
 }
