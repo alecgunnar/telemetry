@@ -1,5 +1,5 @@
 /**
- * Sunseeker Telemety
+ * Sunseeker Telemetry
  *
  * @author Alec Carpenter <alecgunnar@gmail.com>
  * @date July 2, 2016
@@ -7,23 +7,21 @@
 
 package sunseeker.telemetry;
 
-import java.awt.*;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.lang.Thread;
+import java.lang.Runnable;
 
 class Telemetry implements Runnable {
-    NetworkInterface network;
     DataSourceInterface dataSource;
-    ArrayList<DataCollectionInterface> dataCollections;
+    ArrayList<DataCollectionInterface<Double>> dataCollections;
 
 	public static void main (String[] args) {
         EventQueue.invokeLater(new Telemetry());
 	}
 
     public Telemetry () {
-        network         = new Network();
-        dataCollections = new ArrayList<DataCollectionInterface>();
-        dataSource      = new PseudoRandomDataSource(network);
+        dataCollections = new ArrayList<DataCollectionInterface<Double>>();
 
         /*
          * Add the known data types
@@ -32,13 +30,15 @@ class Telemetry implements Runnable {
         registerDataType("voltage", "volts");
         registerDataType("current", "amps");
         registerDataType("array", "watts");
+
+        dataSource = new PseudoRandomDataSource(dataCollections);
     }
 
     public void run () {
         /*
-         * This is the main window which appears
+         * This is the main frame which appears
          */
-        AbstractMainView main = new MainView();
+        AbstractMainFrame main = new MainFrame();
 
         /*
          * Controls the rendering of the main window interface
@@ -71,18 +71,20 @@ class Telemetry implements Runnable {
         /*
          * Start the application
          */
-        controller.run();
+        controller.start();
 
-        Thread dataThread = new Thread(dataSource, "dataSourceThread");
+        /*
+         * Start loading the data
+         */
+        Thread dataThread = new Thread(dataSource, "DataSourceThread");
 
         dataThread.start();
     }
 
     protected void registerDataType (String type, String units) {
-        DataCollectionInterface collection = new DataCollection(type, units);
+        DataCollectionInterface<Double> collection = new DataCollection<Double>(type, units);
 
         dataCollections.add(collection);
-        network.request(type + "_update", collection);
     }
 
     protected AbstractLinePanel[] getLinePanels () {
@@ -97,8 +99,6 @@ class Telemetry implements Runnable {
             );
 
             collection.setEnabled(true);
-
-            network.request(collection.getType() + "_update", panel);
 
             panels[i++] = panel;
         }

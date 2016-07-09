@@ -1,5 +1,5 @@
 /**
-* Sunseeker Telemety
+* Sunseeker Telemetry
 *
 * @author Alec Carpenter <alecgunnar@gmail.com>
 * @date July 2, 2016
@@ -7,30 +7,56 @@
 
 package sunseeker.telemetry;
 
-class MainController {
-    protected AbstractMainView mainView;
+import java.lang.Runnable;
+import java.lang.Thread;
+import java.awt.EventQueue;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
-    public MainController (AbstractMainView main) {
-        mainView = main;
-    }
+class MainController implements Runnable {
+    final public static int LINE_REFRESH_INTERVAL = 250;
 
-    public void run () {
-        mainView.showView();
+    protected AbstractMainFrame mainFrame;
+
+    protected AbstractGraphPanel graphPanel;
+
+    protected boolean paused = false;
+
+    protected Timer lineUpdater;
+
+    public MainController (AbstractMainFrame main) {
+        mainFrame = main;
     }
 
     public void useGraphPanel (AbstractGraphPanel panel) {
-        mainView.useGraphPanel(panel);
+        mainFrame.useGraphPanel(graphPanel = panel);
     }
 
     public void useDataSelectPanel (AbstractDataSelectPanel panel) {
-        mainView.useDataSelectPanel(panel);
+        mainFrame.useDataSelectPanel(panel);
     }
 
     public void useLiveDataPanel (AbstractLiveDataPanel panel) {
-        mainView.useLiveDataPanel(panel);
+        mainFrame.useLiveDataPanel(panel);
     }
 
     public void useLinePanels(AbstractLinePanel[] panels) {
-        mainView.useLinePanels(panels);
+        mainFrame.useLinePanels(panels);
+
+        createLineUpdater();
+    }
+
+    public void start () {
+        mainFrame.showFrame();
+
+        EventQueue.invokeLater(this);
+    }
+
+    public void run () {
+        lineUpdater.start();
+    }
+
+    protected void createLineUpdater () {
+        lineUpdater = new Timer(LINE_REFRESH_INTERVAL, (ActionListener) graphPanel);
     }
 }

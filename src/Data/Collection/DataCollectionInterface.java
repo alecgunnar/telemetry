@@ -1,5 +1,5 @@
 /**
- * Sunseeker Telemety
+ * Sunseeker Telemetry
  *
  * @author Alec Carpenter <alecgunnar@gmail.com>
  * @date July 2, 2016
@@ -8,8 +8,9 @@
 package sunseeker.telemetry;
 
 import java.awt.Color;
+import java.util.Queue;
 
-interface DataCollectionInterface extends NetworkSubscriberInterface {
+interface DataCollectionInterface<E> extends Queue<E> {
     final public static int MAX_DATA_POINTS = 50;
     
     public String getType();
@@ -25,12 +26,4 @@ interface DataCollectionInterface extends NetworkSubscriberInterface {
     public void setProvided(boolean provided);
 
     public boolean isProvided();
-
-    public double getMostRecent();
-
-    public double[] getData();
-
-    public void putData(double value);
-
-    public int count();
 }

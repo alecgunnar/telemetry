@@ -1,5 +1,5 @@
 /**
- * Sunseeker Telemety
+ * Sunseeker Telemetry
  *
  * @author Alec Carpenter <alecgunnar@gmail.com>
  * @date July 2, 2016
@@ -12,11 +12,17 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
-class GraphPanel extends AbstractGraphPanel {
+class GraphPanel extends AbstractGraphPanel implements ActionListener {
     final protected int SCALE_HASH_SIZE = 1;
 
     protected Graphics2D artist;
+
+    public void actionPerformed (ActionEvent evt) {
+        repaint();
+    }
 
     public void paintComponent (Graphics g) {
         super.paintComponent(g);
