@@ -11,7 +11,7 @@ import java.awt.Color;
 import java.util.Queue;
 
 interface DataCollectionInterface<E> extends Queue<E> {
-    final public static int MAX_DATA_POINTS = 50;
+    final public static int MAX_DATA_POINTS = 300;
     
     public String getType();
 
