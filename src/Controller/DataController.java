@@ -8,7 +8,6 @@
 package sunseeker.telemetry;
 
 import java.util.ArrayList;
-
 class DataController {
     protected ArrayList<DataCollectionInterface> dataCollections;
 

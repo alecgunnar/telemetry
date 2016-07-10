@@ -12,15 +12,24 @@ import java.util.ArrayList;
 import java.lang.Thread;
 import java.lang.Runnable;
 
+import java.lang.Exception;
+import java.io.IOException;
+
 class Telemetry implements Runnable {
     DataSourceInterface dataSource;
     ArrayList<DataCollectionInterface<Double>> dataCollections;
+    StoreData archive;
 
-	public static void main (String[] args) {
-        EventQueue.invokeLater(new Telemetry());
+	public static void main (String[] args) throws IOException {
+        try{
+            EventQueue.invokeLater(new Telemetry());
+        }catch(Exception e) {
+            System.out.println("failure to start:" + e);
+        }
+        
 	}
 
-    public Telemetry () {
+    public Telemetry () throws IOException{
         dataCollections = new ArrayList<DataCollectionInterface<Double>>();
 
         /*
@@ -32,6 +41,17 @@ class Telemetry implements Runnable {
         registerDataType("array", "watts");
 
         dataSource = new PseudoRandomDataSource(dataCollections);
+
+        try{
+            archive = new StoreData();
+            archive.startFile();
+            archive.closeAll();
+        }catch(IOException e){
+            System.out.println("Could not write to file" + e);
+        }catch(Exception e){
+            System.out.println("failure: " + e);
+        }
+       
     }
 
     public void run () {
@@ -94,6 +114,7 @@ class Telemetry implements Runnable {
         for (DataCollectionInterface collection : dataCollections) {
             AbstractLinePanel panel = new LinePanel(collection);
 
+
             collection.setProvided(
                 dataSource.provides(collection.getType())
             );
@@ -105,4 +126,5 @@ class Telemetry implements Runnable {
 
         return panels;
     }
+
 }
