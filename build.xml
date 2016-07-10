@@ -13,7 +13,9 @@
 
 	<target name="compile">
 		<mkdir dir="${build.classes_dir}" />
-		<javac srcdir="${src_dir}" destdir="${build.classes_dir}" includeantruntime="false"/>
+		<javac srcdir="${src_dir}" destdir="${build.classes_dir}" includeantruntime="false" fork="true">
+			<compilerarg line="-Xlint:unchecked" />
+		</javac>
 	</target>
 
 	<target name="jar">

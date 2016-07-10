@@ -7,25 +7,29 @@
 
 package sunseeker.telemetry;
 
+import javax.swing.JFrame;
 import java.lang.Runnable;
 import java.lang.Thread;
 import java.awt.EventQueue;
 import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import javax.swing.Timer;
 
-class MainController implements Runnable {
+class MainController implements Runnable, ActionListener{
     final public static int LINE_REFRESH_INTERVAL = 250;
 
     protected AbstractMainFrame mainFrame;
 
     protected AbstractGraphPanel graphPanel;
 
+    protected AbstractLiveDataPanel liveDataPanel;
+
     protected boolean paused = false;
 
     protected Timer lineUpdater;
 
-    public MainController (AbstractMainFrame main) {
-        mainFrame = main;
+    public MainController (AbstractMainFrame frame) {
+        mainFrame = frame;
     }
 
     public void useGraphPanel (AbstractGraphPanel panel) {
@@ -37,7 +41,7 @@ class MainController implements Runnable {
     }
 
     public void useLiveDataPanel (AbstractLiveDataPanel panel) {
-        mainFrame.useLiveDataPanel(panel);
+        mainFrame.useLiveDataPanel(liveDataPanel = panel);
     }
 
     public void useLinePanels(AbstractLinePanel[] panels) {
@@ -56,7 +60,12 @@ class MainController implements Runnable {
         lineUpdater.start();
     }
 
+    public void actionPerformed (ActionEvent evt) {
+        graphPanel.repaint();
+        liveDataPanel.refresh();
+    }
+
     protected void createLineUpdater () {
-        lineUpdater = new Timer(LINE_REFRESH_INTERVAL, (ActionListener) graphPanel);
+        lineUpdater = new Timer(LINE_REFRESH_INTERVAL, this);
     }
 }

@@ -9,16 +9,21 @@ package sunseeker.telemetry;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.lang.Thread;
 import java.lang.Runnable;
 
 import java.lang.Exception;
 import java.io.IOException;
 
 class Telemetry implements Runnable {
+
     DataSourceInterface dataSource;
     ArrayList<DataCollectionInterface<Double>> dataCollections;
     StoreData archive;
+    
+    protected AbstractDataTypeCollection dataTypes;
+
+    protected MainController mainController;
+    protected DataController dataController;
 
 	public static void main (String[] args) throws IOException {
         try{
@@ -31,6 +36,8 @@ class Telemetry implements Runnable {
 
     public Telemetry () throws IOException{
         dataCollections = new ArrayList<DataCollectionInterface<Double>>();
+
+        dataTypes = new DataTypeCollection();
 
         /*
          * Add the known data types
@@ -51,80 +58,105 @@ class Telemetry implements Runnable {
         }catch(Exception e){
             System.out.println("failure: " + e);
         }
-       
+
     }
 
     public void run () {
         /*
          * This is the main frame which appears
          */
-        AbstractMainFrame main = new MainFrame();
+        AbstractMainFrame mainFrame = new MainFrame();
 
         /*
          * Controls the rendering of the main window interface
          */
-        MainController controller = new MainController(main);
+        mainController = new MainController(mainFrame);
 
         /*
          * The graph to display the data
          */
         AbstractGraphPanel graph = new GraphPanel();
-        controller.useGraphPanel(graph);
+        mainController.useGraphPanel(graph);
 
         /*
          * Options regarding which data to display
          */
         AbstractDataSelectPanel dataSelect = new DataSelectPanel();
-        controller.useDataSelectPanel(dataSelect);
+        mainController.useDataSelectPanel(dataSelect);
 
         /*
          * Display for the most recent values of the data being displayed
          */
-        AbstractLiveDataPanel liveData = new LiveDataPanel();
-        controller.useLiveDataPanel(liveData);
+        AbstractLiveDataPanel liveData = new LiveDataPanel(dataTypes);
+        mainController.useLiveDataPanel(liveData);
 
         /*
          * Add the line panels to the graph
          */
-        controller.useLinePanels(getLinePanels());
+        mainController.useLinePanels(getLinePanels());
+
+        /*
+         * Create the data controller and get the source
+         */
+        dataController = new DataController(dataTypes, mainFrame);
+
+        getDataSource();
+
+        /*
+         * Start collecting data
+         */
+        dataController.start();
 
         /*
          * Start the application
          */
-        controller.start();
-
-        /*
-         * Start loading the data
-         */
-        Thread dataThread = new Thread(dataSource, "DataSourceThread");
-
-        dataThread.start();
+        mainController.start();
     }
 
     protected void registerDataType (String type, String units) {
-        DataCollectionInterface<Double> collection = new DataCollection<Double>(type, units);
+        DataTypeInterface collection = new DataType(type, units);
 
-        dataCollections.add(collection);
+        dataTypes.add(collection);
     }
 
     protected AbstractLinePanel[] getLinePanels () {
-        AbstractLinePanel[] panels = new AbstractLinePanel[dataCollections.size()];
+        AbstractLinePanel[] panels = new AbstractLinePanel[dataTypes.size()];
         int i = 0;
 
-        for (DataCollectionInterface collection : dataCollections) {
-            AbstractLinePanel panel = new LinePanel(collection);
+        for (DataTypeInterface type : dataTypes)
+            panels[i++] = new LinePanel(type);
+
 
 
             collection.setProvided(
                 dataSource.provides(collection.getType())
             );
 
-            collection.setEnabled(true);
+        return panels;
+    }
 
-            panels[i++] = panel;
+    protected void getDataSource () {
+        DataSourceInterface current;
+
+        if ((current = dataController.getDataSource()) != null) {
+            current.stop();
         }
 
-        return panels;
+        dataController.promptForDataSource();
+
+        checkDataTypes(dataController.getDataSource());
+    }
+
+    protected void checkDataTypes (DataSourceInterface dataSource) {
+        if (dataSource != null) {
+            for (DataTypeInterface type : dataTypes) {
+                type.setProvided(
+                    dataSource.provides(type.getType())
+                );
+
+                type.setEnabled(true);
+            }
+        }
     }
 
 }

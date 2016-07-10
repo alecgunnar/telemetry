@@ -8,11 +8,13 @@
 package sunseeker.telemetry;
 
 interface DataSourceInterface extends Runnable {
-    final public static String SPEED_UPDATE = "speed_update";
+    public String getName();
 
     public String[] getTypes();
 
     public boolean provides(String type);
 
-    public String getName();
+    public void pause();
+
+    public void stop();
 }

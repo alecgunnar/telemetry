@@ -7,11 +7,12 @@
 
 package sunseeker.telemetry;
 
+import java.util.Collections;
 import java.util.ArrayList;
+import java.util.List;
 import java.awt.Color;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-class DataCollection<E> extends ConcurrentLinkedQueue<E> implements DataCollectionInterface<E> {
+class DataType implements DataTypeInterface {
     protected Color[] colors = {
         Color.GREEN,
         Color.BLUE,
@@ -31,9 +32,13 @@ class DataCollection<E> extends ConcurrentLinkedQueue<E> implements DataCollecti
     protected boolean enabled  = false;
     protected boolean provided = false;
 
-    protected int numValues = 0;
+    protected double min = 0;
+    protected double cur = 0;
+    protected double max = 0;
 
-    public DataCollection (String type, String units) {
+    protected List<Double> data;
+
+    public DataType (String type, String units) {
         this.type  = type;
         this.units = units;
 
@@ -42,6 +47,11 @@ class DataCollection<E> extends ConcurrentLinkedQueue<E> implements DataCollecti
          */
         color = colors[colorCount % colors.length];
         colorCount++;
+
+        /*
+         * Create a synconized data list
+         */
+        data = Collections.synchronizedList(new ArrayList<Double>());
     }
 
     public String getType () {
@@ -82,5 +92,38 @@ class DataCollection<E> extends ConcurrentLinkedQueue<E> implements DataCollecti
 
     public boolean isProvided () {
         return provided;
+    }
+
+    public void putValue (double value) {
+        data.add(value);
+
+        cur = value;
+
+        if (data.size() == 0) {
+            min = value;
+            max = value;
+        } else {
+            if (value < min)
+                min = value;
+
+            if (value > max)
+                max = value;
+        }
+    }
+
+    public List<Double> getData () {
+        return data;
+    }
+
+    public double getMinimumValue () {
+        return min;
+    }
+
+    public double getCurrentValue () {
+        return cur;
+    }
+
+    public double getMaximumValue () {
+        return max;
     }
 }

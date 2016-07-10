@@ -27,6 +27,8 @@ class MainFrame extends AbstractMainFrame {
 
     protected int depth = 1;
 
+    protected int dataPanelsWidth = 0;
+
     public MainFrame () {
         /*
          * Only need to build once
@@ -37,7 +39,7 @@ class MainFrame extends AbstractMainFrame {
         /*
          * The app should not quit when this view is closed
          */
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         /*
          * The minimum size of the window
@@ -113,7 +115,7 @@ class MainFrame extends AbstractMainFrame {
         /*
          * Set the size and position of the panel
          */
-        positionDataPanel(panel, true);
+        positionDataPanel(panel, (int) (FRAME_WIDTH * .3));
 
         /*
          * Add the panel to the view
@@ -135,7 +137,7 @@ class MainFrame extends AbstractMainFrame {
         /*
          * Set the size and position of the panel
          */
-        positionDataPanel(panel, false);
+        positionDataPanel(panel, (int) (FRAME_WIDTH * .7));
 
         /*
          * Add the panel to the view
@@ -200,13 +202,11 @@ class MainFrame extends AbstractMainFrame {
         );
     }
 
-    protected void positionDataPanel (AbstractPanel panel, boolean leftMost) {
-        int width = (FRAME_WIDTH / 2) - PADDING;
-        int posX  = width + 2;
-        int posY  = AbstractGraphPanel.PANEL_HEIGHT + PADDING;
+    protected void positionDataPanel (AbstractPanel panel, int width) {
+        width -= PADDING;
 
-        if (leftMost)
-            posX = 0;
+        int posX  = dataPanelsWidth;
+        int posY  = AbstractGraphPanel.PANEL_HEIGHT + PADDING;
 
         /*
          * The precision required here is somewhat annoying...
@@ -215,5 +215,7 @@ class MainFrame extends AbstractMainFrame {
             posX, posY, width,
             (FRAME_HEIGHT - AXIS_PADDING) - (posY + AXIS_PADDING)
         );
+
+        dataPanelsWidth += width;
     }
 }

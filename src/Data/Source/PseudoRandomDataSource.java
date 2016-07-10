@@ -7,61 +7,75 @@
 
 package sunseeker.telemetry;
 
-import java.util.Arrays;
 import java.util.Random;
-import java.lang.Runnable;
-import java.lang.Thread;
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-class PseudoRandomDataSource implements DataSourceInterface, Runnable {
-    protected String[] types = {
-        "speed", "voltage", "current", "array"
-    };
+class PseudoRandomDataSource extends AbstractDataSource {
+    protected Timer scheduler;
 
-    protected HashMap<String, DataCollectionInterface<Double>> collections;
+    protected Random randGen;
 
-    public PseudoRandomDataSource (ArrayList<DataCollectionInterface<Double>> collections) {
-        this.collections = new HashMap<String, DataCollectionInterface<Double>>();
+    protected boolean scheduled;
 
-        for (DataCollectionInterface<Double> collection : collections)
-            this.collections.put(collection.getType(), collection);
-    }
+    public PseudoRandomDataSource (AbstractDataTypeCollection dataTypes) {
+        super(dataTypes);
 
-    public String[] getTypes () {
-        return types;
-    }
+        scheduler = new Timer();
+        randGen   = new Random();
 
-    public boolean provides (String type) {
-        Arrays.sort(types);
-
-        return Arrays.binarySearch(types, type) >= 0;
-    }
-
-    public void run () {
-        Random rand = new Random();
-
-        double val;
-
-        while (true) {
-            for (String type : types) {
-                if (!collections.containsKey(type))
-                    continue;
-
-                val = 200 * ((rand.nextDouble() * 2) - 1);
-
-                collections.get(type).offer(val);
-            }
-
-            try {
-                Thread.sleep(MainController.LINE_REFRESH_INTERVAL * 2);
-            } catch (Exception e) {
-
-            }
-        }
+        providedTypes = new String[] {
+            "speed", "voltage", "current", "array"
+        };
     }
 
     public String getName () {
         return "Pseudo Random Data Source";
+    }
+
+    public void run () {
+        List<Double> data;
+        double val;
+
+        for (String type : providedTypes) {
+            if (!types.containsKey(type))
+                continue;
+
+            data = types.get(type).getData();
+
+            val = 500 * ((randGen.nextDouble() * 2) - 1);
+
+            data.clear();
+            types.get(type).putValue(val);
+        }
+
+        if (!scheduled)
+            scheduleTask();
+    }
+
+    public void stop () {
+        scheduler.cancel();
+        scheduler.purge();
+
+        scheduled = false;
+    }
+
+    public void pause () {
+        stop();
+    }
+
+    protected void scheduleTask () {
+        long delay = MainController.LINE_REFRESH_INTERVAL;
+
+        final DataSourceInterface data = this;
+
+        scheduler.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                data.run();
+            }
+        }, delay, delay);
+
+        scheduled = true;
     }
 }
