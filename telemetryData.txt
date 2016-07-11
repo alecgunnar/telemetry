@@ -1,2 +1,0 @@
-Counter: 	Time,	Voltage,	Current,	Speed,	Errors
-Counter: 	Time,	Voltage,	Current,	Speed,	Errors

@@ -7,9 +7,6 @@
 
 package sunseeker.telemetry;
 
-import javax.swing.JFileChooser;
+class OpenData extends AbstractArchive {
 
-abstract class AbstractStorage extends JFileChooser {
-
-    
 }

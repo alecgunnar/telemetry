@@ -8,30 +8,25 @@
 package sunseeker.telemetry;
 
 import java.io.File;
-import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import java.lang.Exception;
 import java.io.IOException;
 
-public class StoreData extends FileSelect {
+public class ArchiveData {
 	
+	//public String fileName = "telemetryData";
+
 	protected File file;
 
-	//protected BufferedReader read;
-
-	protected PrintWriter create;
 	protected FileWriter write;
 
 	protected static int counter = 0;
 	protected static String line;
 
-	final String HEAD = "Counter: ";
-
+	final String HEAD = "Counter, ";
 	final String TIME    = "Time,";
 	final String SPEED   = "Speed,";
 	final String VOLTAGE = "Voltage,";
@@ -39,30 +34,37 @@ public class StoreData extends FileSelect {
 	final String ERRORS  = "Errors";
 
 
-	StoreData () throws IOException{
+	ArchiveData (String fileName) throws IOException{
+
+		/*
+		* create text file with file name from fileSelect
+		*/		
+		file = new File(fileName + ".txt");
 		
 		try{
-
-			file = new File(fileName + ".txt");
-			create = new PrintWriter("telemetryData11569.txt","ASCII");
+			write = new FileWriter(file);
 		}
 		catch(Exception e) {
 			System.out.println("the file is shit");
 		}
-		write = new FileWriter(file, true);
 
-		startFile();
-
-
+		this.startFile();
 	}
 
+	/*
+	* add headers to file in csv format;
+	*/
 	protected void startFile () throws IOException {
-		write.write(HEAD + "\t" + TIME + "\t" + VOLTAGE + "\t" + CURRENT + "\t" + SPEED + "\t" + ERRORS);
+		write.append("" + HEAD  + TIME + VOLTAGE + CURRENT + SPEED + ERRORS);
 		write.append("\n");
 	}
 
-	protected static String packageData (DataCollectionInterface data) {
+	protected static String packageData (ArchiveCollection data) {
 		String line = "";
+
+		/*
+		* Test Data
+		*/
 		String speed = "10",volt = "100",amp = " 500";
 
 		
@@ -88,7 +90,6 @@ public class StoreData extends FileSelect {
 
 	public void closeAll () throws IOException{
 		try{
-			create.close();
 			write.close();
 		}
 		catch(Exception e){
@@ -96,7 +97,5 @@ public class StoreData extends FileSelect {
 		}
 		//read.close();
 	}
-
-	
 
 }

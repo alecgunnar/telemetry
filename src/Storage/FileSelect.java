@@ -7,42 +7,43 @@
 
 package sunseeker.telemetry;
 
+import javax.swing.JFileChooser;
+
+//import java.io.IOException;
+
+public class FileSelect extends AbstractArchive {
+
+	protected String fileName = "telemetryData";
+	protected JFileChooser select;
+
+	protected ArchiveData archive;
 
 
-class FileSelect {
-
-	public String fileName = "telemetryData";
 
 	FileSelect () {
-		
+		select = new JFileChooser();
 	}
 
 
+	protected String chooseFile() {
+		int returnVal = select.showOpenDialog(getParent());
 
-	/*
-	* auto create name, check for previous files
-	*/
-	/*
-	public static boolean setFileName () {
-		boolean open = false;
-		int counter = 0;
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+			System.out.println("Writing to: " + select.getSelectedFile().getName());
+			System.out.println(select.getSelectedFile());
+		}
 
-		do{
-			try{
-				read = new BufferedReader(new FileReader(fileName + ".txt"));
-				counter++;
-				fileName = (filename + "(" + counter + ")");
-				open = false;
-				if(counter == 150)
-					return false;
-			}
-			catch (Exception e) {
-				open = true;
-			}
-		}while(!open);
+		return select.getSelectedFile().toString();
+	}
 
-		return open;
-		
+/*
+	protected void archive () throws IOException {
+		try{
+			archive = new ArchiveData(select.getSelectedFile().toString());
+		}
+		catch(IOException e) {
+			System.out.println("Falure to properly write to file...");
+		}
 	}
 	*/
 }

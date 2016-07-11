@@ -17,25 +17,22 @@ import java.io.IOException;
 class Telemetry implements Runnable {
 
     DataSourceInterface dataSource;
-    ArrayList<DataCollectionInterface<Double>> dataCollections;
-    StoreData archive;
-    
+    DataTypeInterface collection;
+    FileSelect select;
+
+    protected ArchiveData archive;
+
     protected AbstractDataTypeCollection dataTypes;
 
     protected MainController mainController;
     protected DataController dataController;
+    protected ArchiveController archiveController;
 
 	public static void main (String[] args) throws IOException {
-        try{
-            EventQueue.invokeLater(new Telemetry());
-        }catch(Exception e) {
-            System.out.println("failure to start:" + e);
-        }
-        
+        EventQueue.invokeLater(new Telemetry());
 	}
 
     public Telemetry () throws IOException{
-        dataCollections = new ArrayList<DataCollectionInterface<Double>>();
 
         dataTypes = new DataTypeCollection();
 
@@ -47,15 +44,18 @@ class Telemetry implements Runnable {
         registerDataType("current", "amps");
         registerDataType("array", "watts");
 
-        dataSource = new PseudoRandomDataSource(dataCollections);
+        dataSource = new PseudoRandomDataSource(dataTypes);
 
         try{
-            archive = new StoreData();
-            archive.startFile();
+            select = new FileSelect();
+            
+            archive = new ArchiveData(select.chooseFile());
             archive.closeAll();
-        }catch(IOException e){
+        }
+        catch(IOException e){
             System.out.println("Could not write to file" + e);
-        }catch(Exception e){
+        }
+        catch(Exception e){
             System.out.println("failure: " + e);
         }
 
@@ -103,6 +103,11 @@ class Telemetry implements Runnable {
         getDataSource();
 
         /*
+        * create controller to store data
+        */
+        archiveController = new ArchiveController(dataTypes);
+
+        /*
          * Start collecting data
          */
         dataController.start();
@@ -114,7 +119,7 @@ class Telemetry implements Runnable {
     }
 
     protected void registerDataType (String type, String units) {
-        DataTypeInterface collection = new DataType(type, units);
+        collection = new DataType(type, units);
 
         dataTypes.add(collection);
     }
@@ -125,8 +130,6 @@ class Telemetry implements Runnable {
 
         for (DataTypeInterface type : dataTypes)
             panels[i++] = new LinePanel(type);
-
-
 
             collection.setProvided(
                 dataSource.provides(collection.getType())
@@ -157,6 +160,10 @@ class Telemetry implements Runnable {
                 type.setEnabled(true);
             }
         }
+    }
+
+    protected void getDataToStore () {
+
     }
 
 }

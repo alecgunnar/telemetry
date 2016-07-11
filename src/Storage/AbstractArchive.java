@@ -7,6 +7,8 @@
 
 package sunseeker.telemetry;
 
-class StoredDataDisplay extends AbstractStorage {
+import javax.swing.JFileChooser;
+
+abstract class AbstractArchive extends JFileChooser {
 
 }
