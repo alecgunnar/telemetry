@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Thread;
 
-public class ArchiveController {
+class ArchiveController {
     protected HashMap<String, DataSourceInterface> dataSources;
 
     protected DataSourceInterface dataSource;

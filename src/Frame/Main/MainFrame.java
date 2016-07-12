@@ -21,6 +21,7 @@ class MainFrame extends AbstractMainFrame {
     protected Container contentPane;
     protected JLayeredPane layeredPane;
 
+    protected AbstractMenu menu;
     protected AbstractGraphPanel graphPanel;
     protected AbstractDataSelectPanel dataSelectPanel;
     protected AbstractLiveDataPanel liveDataPanel;
@@ -73,6 +74,34 @@ class MainFrame extends AbstractMainFrame {
             graphPanel.repaint();
 
         super.showFrame();
+    }
+
+    public void useMenu (AbstractMenu menuBar) {
+        menu = menuBar;
+
+        contentPane.add(menu);
+
+        /*
+        * add menu to top of frame
+        */
+        layout.putConstraint(
+            SpringLayout.NORTH, menu,
+            0,
+            SpringLayout.NORTH, contentPane
+        );
+
+        layout.putConstraint(
+            SpringLayout.WEST, menu,
+            0,
+            SpringLayout.WEST, contentPane
+        );
+
+        layout.putConstraint(
+            SpringLayout.EAST, menu,
+            0,
+            SpringLayout.EAST, contentPane
+        );
+
     }
 
     public void useGraphPanel (AbstractGraphPanel panel) {
