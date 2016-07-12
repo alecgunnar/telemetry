@@ -3,6 +3,9 @@
  *
  * @author Alec Carpenter <alecgunnar@gmail.com>
  * @date July 2, 2016
+ *
+ * @modified by Kai Gray <kai.a.gray@wmich.edu>
+ * @date July 10, 2016
  */
 
 package sunseeker.telemetry;
@@ -18,9 +21,6 @@ class Telemetry implements Runnable {
 
     DataSourceInterface dataSource;
     DataTypeInterface collection;
-    FileSelect select;
-
-    protected ArchiveData archive;
 
     protected AbstractDataTypeCollection dataTypes;
 
@@ -32,7 +32,7 @@ class Telemetry implements Runnable {
         EventQueue.invokeLater(new Telemetry());
 	}
 
-    public Telemetry () throws IOException{
+    public Telemetry () {
 
         dataTypes = new DataTypeCollection();
 
@@ -45,20 +45,6 @@ class Telemetry implements Runnable {
         registerDataType("array", "watts");
 
         dataSource = new PseudoRandomDataSource(dataTypes);
-
-        try{
-            select = new FileSelect();
-            
-            archive = new ArchiveData(select.chooseFile());
-            archive.closeAll();
-        }
-        catch(IOException e){
-            System.out.println("Could not write to file" + e);
-        }
-        catch(Exception e){
-            System.out.println("failure: " + e);
-        }
-
     }
 
     public void run () {
@@ -105,8 +91,17 @@ class Telemetry implements Runnable {
         /*
         * create controller to store data
         */
-        archiveController = new ArchiveController(dataTypes);
+        archiveController = new ArchiveController(dataSource);
 
+        /*
+        * start storing data
+        */
+        try{
+            archiveController.start();
+        } catch (IOException e) {
+            System.out.println("IOException occured on start");
+        }
+        
         /*
          * Start collecting data
          */

@@ -15,9 +15,7 @@ import java.io.OutputStreamWriter;
 import java.lang.Exception;
 import java.io.IOException;
 
-public class ArchiveData {
-	
-	//public String fileName = "telemetryData";
+public class ArchiveData extends AbstractArchive {
 
 	protected File file;
 
@@ -26,7 +24,7 @@ public class ArchiveData {
 	protected static int counter = 0;
 	protected static String line;
 
-	final String HEAD = "Counter, ";
+	final String HEAD    = "Counter,";
 	final String TIME    = "Time,";
 	final String SPEED   = "Speed,";
 	final String VOLTAGE = "Voltage,";
@@ -37,15 +35,16 @@ public class ArchiveData {
 	ArchiveData (String fileName) throws IOException{
 
 		/*
-		* create text file with file name from fileSelect
+		* create text file with fileName from FileSelect class
 		*/		
 		file = new File(fileName + ".txt");
 		
 		try{
 			write = new FileWriter(file);
-		}
-		catch(Exception e) {
-			System.out.println("the file is shit");
+		} catch (IOException e) {
+			System.out.println("Failed to open file... ");
+		} catch(Exception e) {
+			System.out.println("Probably your fault... " + e);
 		}
 
 		this.startFile();
@@ -59,7 +58,7 @@ public class ArchiveData {
 		write.append("\n");
 	}
 
-	protected static String packageData (ArchiveCollection data) {
+	protected static String packageData (DataTypeInterface data) {
 		String line = "";
 
 		/*
@@ -68,13 +67,18 @@ public class ArchiveData {
 		String speed = "10",volt = "100",amp = " 500";
 
 		
-
+		/*
+		* packs data in order of headers
+		*/
 		line = (counter + ", " + counter + ", " + volt + ", " + amp + ", " + "00" + "\n");
+		counter++;
 
 		return line;
 	}
 
-
+	/*
+	* add a line of text to file
+	*/
 	protected void writeData (String line) throws IOException { 
 
 		try{
@@ -88,14 +92,17 @@ public class ArchiveData {
 			
 	}
 
+	/*
+	* properly close file(s)
+	*/
 	public void closeAll () throws IOException{
 		try{
 			write.close();
+		} catch(IOException e) {
+			System.out.println("Failed to close file... \n Error:" + e);
+		} catch(Exception e){
+			System.out.println("Probably your fault... " + e);
 		}
-		catch(Exception e){
-			System.out.println("write was not closed \n Error:" + e);
-		}
-		//read.close();
 	}
 
 }
