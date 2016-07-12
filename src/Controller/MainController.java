@@ -32,6 +32,10 @@ class MainController implements Runnable, ActionListener{
         mainFrame = frame;
     }
 
+    public void useMenu (AbstractMenu menu) {
+        mainFrame.useMenu(menu);
+    }
+
     public void useGraphPanel (AbstractGraphPanel panel) {
         mainFrame.useGraphPanel(graphPanel = panel);
     }

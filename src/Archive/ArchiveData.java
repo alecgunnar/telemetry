@@ -95,7 +95,7 @@ public class ArchiveData extends AbstractArchive {
 	/*
 	* properly close file(s)
 	*/
-	public void closeAll () throws IOException{
+	public void closeAll () throws IOException {
 		try{
 			write.close();
 		} catch(IOException e) {
@@ -103,6 +103,20 @@ public class ArchiveData extends AbstractArchive {
 		} catch(Exception e){
 			System.out.println("Probably your fault... " + e);
 		}
+	}
+
+	public void saveFile () throws IOException {
+
+		this.closeAll();
+		
+		try{
+			write = new FileWriter (file, true);
+		} catch (IOException e) {
+			System.out.println("Failed to properly reopen file.");
+		} catch (Exception e) {
+			System.out.println("Failed to save file");
+		}
+
 	}
 
 }
