@@ -3,6 +3,9 @@
  *
  * @author Alec Carpenter <alecgunnar@gmail.com>
  * @date July 2, 2016
+ *
+ * @modified by Kai Gray <kai.a.gray@wmich.edu>
+ * @date July 10, 2016
  */
 
 package sunseeker.telemetry;
@@ -11,17 +14,26 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.lang.Runnable;
 
+import java.lang.Exception;
+import java.io.IOException;
+
 class Telemetry implements Runnable {
+
+    DataSourceInterface dataSource;
+    DataTypeInterface collection;
+
     protected AbstractDataTypeCollection dataTypes;
 
     protected MainController mainController;
     protected DataController dataController;
+    protected ArchiveController archiveController;
 
-	public static void main (String[] args) {
+	public static void main (String[] args) throws IOException {
         EventQueue.invokeLater(new Telemetry());
 	}
 
     public Telemetry () {
+
         dataTypes = new DataTypeCollection();
 
         /*
@@ -31,6 +43,8 @@ class Telemetry implements Runnable {
         registerDataType("voltage", "volts");
         registerDataType("current", "amps");
         registerDataType("array", "watts");
+
+        dataSource = new PseudoRandomDataSource(dataTypes);
     }
 
     public void run () {
@@ -75,6 +89,20 @@ class Telemetry implements Runnable {
         getDataSource();
 
         /*
+        * create controller to store data
+        */
+        archiveController = new ArchiveController(dataSource);
+
+        /*
+        * start storing data
+        */
+        try{
+            archiveController.start();
+        } catch (IOException e) {
+            System.out.println("IOException occured on start");
+        }
+        
+        /*
          * Start collecting data
          */
         dataController.start();
@@ -86,7 +114,7 @@ class Telemetry implements Runnable {
     }
 
     protected void registerDataType (String type, String units) {
-        DataTypeInterface collection = new DataType(type, units);
+        collection = new DataType(type, units);
 
         dataTypes.add(collection);
     }
@@ -97,6 +125,10 @@ class Telemetry implements Runnable {
 
         for (DataTypeInterface type : dataTypes)
             panels[i++] = new LinePanel(type);
+
+            collection.setProvided(
+                dataSource.provides(collection.getType())
+            );
 
         return panels;
     }
@@ -124,4 +156,9 @@ class Telemetry implements Runnable {
             }
         }
     }
+
+    protected void getDataToStore () {
+
+    }
+
 }

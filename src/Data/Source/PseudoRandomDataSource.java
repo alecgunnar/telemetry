@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class PseudoRandomDataSource extends AbstractDataSource {
+class PseudoRandomDataSource extends AbstractDataSource implements DataSourceInterface{
     protected Timer scheduler;
 
     protected Random randGen;
