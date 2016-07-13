@@ -8,6 +8,7 @@
 package sunseeker.telemetry;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import java.lang.Runnable;
 import java.lang.Thread;
 import java.awt.EventQueue;

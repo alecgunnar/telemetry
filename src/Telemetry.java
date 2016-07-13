@@ -10,6 +10,7 @@
 
 package sunseeker.telemetry;
 
+import javax.swing.SwingUtilities;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.lang.Runnable;
@@ -101,13 +102,13 @@ class Telemetry implements Runnable {
 
         /*
         * start storing data
-        */
+        *//*
         try{
             archiveController.start();
         } catch (IOException e) {
             System.out.println("IOException occured on start");
         }
-        
+        */
         /*
          * Start collecting data
          */

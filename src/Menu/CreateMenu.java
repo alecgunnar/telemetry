@@ -33,30 +33,26 @@ class CreateMenu extends AbstractMenu {
 
 
 	CreateMenu () {
-		this.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+		setMinimumSize(new Dimension(WIDTH, HEIGHT));
 
-		this.menus();
-		this.menuItems();
+		menus();
+		menuItems();
 
 
 		source.add(selectSource);
-		addMenu(source);
+		add(source);
 		
 		file.add(selectFile);
 		file.add(closeFile);
 		file.add(saveFile);
-		addMenu(file);
+		add(file);
 		
 		session.add(startSess);
 		session.add(pause);
 		session.add(stop);
 		session.add(endSess);
-		addMenu(session);
+		add(session);
 
-	}
-
-	protected void addMenu (JMenu menu) {
-		this.add(menu);
 	}
 
 	protected void menus () {

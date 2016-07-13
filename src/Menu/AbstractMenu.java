@@ -11,7 +11,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 
-abstract class AbstractMenu extends AbstractPanel {
+abstract class AbstractMenu extends JMenuBar {
 
 	protected final String SOURCE = "Data Source";
 
