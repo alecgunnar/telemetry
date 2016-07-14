@@ -7,6 +7,8 @@
 
 package sunseeker.telemetry;
 
+import javax.swing.JFrame;
+
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -14,11 +16,15 @@ import java.util.HashMap;
 import java.lang.Thread;
 
 class ArchiveController {
+    protected AbstractDataTypeCollection dataTypes;
+
     protected HashMap<String, DataSourceInterface> dataSources;
 
     protected DataSourceInterface dataSource;
 
     protected Thread dataThread;
+
+    protected JFrame parent;
 
     protected FileSelect select;
 
@@ -26,10 +32,19 @@ class ArchiveController {
 
     protected OpenData open;
 
-    ArchiveController (DataSourceInterface source) {
-        dataSources = new HashMap<String, DataSourceInterface>();
-        this.dataSource = source;
+    ArchiveController (AbstractDataTypeCollection collections, JFrame frame) {
 
+        dataTypes = collections;
+        parent = frame;
+
+        dataSources = new HashMap<String, DataSourceInterface>();
+
+        /*
+         * Register the known data source types
+         */
+        registerDataSource(new PseudoRandomDataSource(dataTypes));
+        registerDataSource(new TenCarDataSource(dataTypes, parent));
+        
         select = new FileSelect();
     }
 
@@ -44,12 +59,12 @@ class ArchiveController {
         dataThread = new Thread(dataSource, "DataSourceThread");
 
         dataThread.start();
-
-        this.promptForSaveFile();
-    }
+        
+        promptForSaveFile();
+        
+    }        
 
     public void stop () throws IOException {
-
         try {
             archive.closeAll();
             dataSource.stop();
@@ -59,18 +74,15 @@ class ArchiveController {
         } catch (InterruptedException e) {
             System.out.println("Could not stop the data source thread...");
         }
-
     }
 
-    public void promptForSaveFile () throws IOException{
+    public void promptForSaveFile () throws IOException {
 
         /*
-         * Start writing to file
+         * select and open file
          */
         try{            
             archive = new ArchiveData(select.chooseSaveFile());
-
-            this.stop();
         }
         catch(IOException e){
             System.out.println("Could not write to file" + e);
@@ -79,6 +91,10 @@ class ArchiveController {
             System.out.println("failure: " + e);
         }
           
+    }
+
+    public void saveFile () {
+        //archive.saveFIle();
     }
 
     public DataSourceInterface getDataSource () {

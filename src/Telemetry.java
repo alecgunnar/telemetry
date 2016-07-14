@@ -10,7 +10,6 @@
 
 package sunseeker.telemetry;
 
-import javax.swing.SwingUtilities;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.lang.Runnable;
@@ -23,11 +22,11 @@ class Telemetry implements Runnable {
     DataSourceInterface dataSource;
     DataTypeInterface collection;
 
-    protected AbstractDataTypeCollection dataTypes;
+    protected static AbstractDataTypeCollection dataTypes;
 
     protected MainController mainController;
-    protected DataController dataController;
-    protected ArchiveController archiveController;
+    protected static DataController dataController;
+    protected static ArchiveController archiveController;
 
 	public static void main (String[] args) throws IOException {
         EventQueue.invokeLater(new Telemetry());
@@ -98,21 +97,21 @@ class Telemetry implements Runnable {
         /*
         * create controller to store data
         */
-        archiveController = new ArchiveController(dataSource);
+        archiveController = new ArchiveController(dataTypes, mainFrame);
 
         /*
         * start storing data
-        *//*
-        try{
+        */
+        /*try{
             archiveController.start();
         } catch (IOException e) {
             System.out.println("IOException occured on start");
-        }
-        */
+        }*/
+
         /*
          * Start collecting data
          */
-        dataController.start();
+        //dataController.start();
 
         /*
          * Start the application
@@ -140,7 +139,7 @@ class Telemetry implements Runnable {
         return panels;
     }
 
-    protected void getDataSource () {
+    protected static void getDataSource () {
         DataSourceInterface current;
 
         if ((current = dataController.getDataSource()) != null) {
@@ -152,7 +151,7 @@ class Telemetry implements Runnable {
         checkDataTypes(dataController.getDataSource());
     }
 
-    protected void checkDataTypes (DataSourceInterface dataSource) {
+    protected static void checkDataTypes (DataSourceInterface dataSource) {
         if (dataSource != null) {
             for (DataTypeInterface type : dataTypes) {
                 type.setProvided(
@@ -164,8 +163,11 @@ class Telemetry implements Runnable {
         }
     }
 
-    protected void getDataToStore () {
-
+    public static DataController getDataController () {
+        return dataController;
     }
 
+    public static ArchiveController getArchiveController () {
+        return archiveController;
+    }
 }
