@@ -11,7 +11,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 
-abstract class AbstractMenu extends AbstractPanel {
+abstract class AbstractMenu extends JMenuBar {
 
 	protected final String SOURCE = "Data Source";
 
@@ -25,10 +25,9 @@ abstract class AbstractMenu extends AbstractPanel {
 
 	protected final String DATA = "Data";
 
-	protected final String ACTION_DATA_START = "Start Session";
-	protected final String ACTION_DATA_PAUSE = "Pause Data";
-	protected final String ACTION_DATA_STOP  = "Stop Data";
-	protected final String ACTION_DATA_END   = "End Session";
+	protected final String ACTION_DATA_START   = "Start Session";
+	protected final String ACTION_DATA_END    = "End Session";
+	protected final String ACTION_DATA_RESTART = "Restart Data";
 
 	protected final int HEIGHT = 10;
 	protected final int WIDTH  = 1000;
