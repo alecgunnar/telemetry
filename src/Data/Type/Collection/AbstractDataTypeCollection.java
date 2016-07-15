@@ -5,10 +5,10 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import java.util.ArrayList;
 
-abstract class AbstractDataTypeCollection extends ArrayList<DataTypeInterface> {
+public abstract class AbstractDataTypeCollection extends ArrayList<DataTypeInterface> {
 
 }

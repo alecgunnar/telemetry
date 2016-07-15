@@ -5,123 +5,203 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;
 
-import java.awt.EventQueue;
+import org.wmich.sunseeker.telemetry.controller.AbstractController;
+import org.wmich.sunseeker.telemetry.controller.MainController;
+import org.wmich.sunseeker.telemetry.controller.DataController;
+import org.wmich.sunseeker.telemetry.dispatcher.Dispatcher;
+import org.wmich.sunseeker.telemetry.dispatcher.DispatchableInterface;
+
 import java.util.ArrayList;
-import java.lang.Runnable;
 
-class Telemetry implements Runnable {
-    protected AbstractDataTypeCollection dataTypes;
+public class Telemetry extends AbstractController implements DispatchableInterface {
+    /*
+     * Events triggered at the application level
+     */
+    final public static int APP_START_EVENT = 0x02;
+    final public static int APP_TERM_EVENT  = 0x00;
 
-    protected MainController mainController;
-    protected DataController dataController;
+    final public static int MAIN_FRAME_CREATED_EVENT = 0x01;
+
+    /*
+     * The controllers to manage each part of the application
+     */
+    protected ArrayList<AbstractController> controllers;
 
 	public static void main (String[] args) {
-        EventQueue.invokeLater(new Telemetry());
+        Dispatcher dispatcher = new Dispatcher();
+        Telemetry telemetry   = new Telemetry(dispatcher);
+
+        telemetry.run();
 	}
 
-    public Telemetry () {
-        dataTypes = new DataTypeCollection();
+    public Telemetry (Dispatcher dispatcher) {
+        super(dispatcher);
 
-        /*
-         * Add the known data types
-         */
-        registerDataType("speed", "mph");
-        registerDataType("voltage", "volts");
-        registerDataType("current", "amps");
-        registerDataType("array", "watts");
+        controllers = new ArrayList<AbstractController>();
     }
 
     public void run () {
         /*
-         * This is the main frame which appears
+         * Initialize the application
          */
-        AbstractMainFrame mainFrame = new MainFrame();
+        registerControllers();
+        registerEventTypes();
+        registerEventListeners();
 
         /*
-         * Controls the rendering of the main window interface
+         * Create the main frame
          */
-        mainController = new MainController(mainFrame);
+        emit(MAIN_FRAME_CREATED_EVENT, new MainFrame());
 
         /*
-         * The graph to display the data
+         * Get the application rolling
          */
-        AbstractGraphPanel graph = new GraphPanel();
-        mainController.useGraphPanel(graph);
-
-        /*
-         * Options regarding which data to display
-         */
-        AbstractDataSelectPanel dataSelect = new DataSelectPanel();
-        mainController.useDataSelectPanel(dataSelect);
-
-        /*
-         * Display for the most recent values of the data being displayed
-         */
-        AbstractLiveDataPanel liveData = new LiveDataPanel(dataTypes);
-        mainController.useLiveDataPanel(liveData);
-
-        /*
-         * Add the line panels to the graph
-         */
-        mainController.useLinePanels(getLinePanels());
-
-        /*
-         * Create the data controller and get the source
-         */
-        dataController = new DataController(dataTypes, mainFrame);
-
-        getDataSource();
-
-        /*
-         * Start collecting data
-         */
-        dataController.start();
-
-        /*
-         * Start the application
-         */
-        mainController.start();
+        emit(APP_START_EVENT);
     }
 
-    protected void registerDataType (String type, String units) {
-        DataTypeInterface collection = new DataType(type, units);
-
-        dataTypes.add(collection);
-    }
-
-    protected AbstractLinePanel[] getLinePanels () {
-        AbstractLinePanel[] panels = new AbstractLinePanel[dataTypes.size()];
-        int i = 0;
-
-        for (DataTypeInterface type : dataTypes)
-            panels[i++] = new LinePanel(type);
-
-        return panels;
-    }
-
-    protected void getDataSource () {
-        DataSourceInterface current;
-
-        if ((current = dataController.getDataSource()) != null) {
-            current.stop();
-        }
-
-        dataController.promptForDataSource();
-
-        checkDataTypes(dataController.getDataSource());
-    }
-
-    protected void checkDataTypes (DataSourceInterface dataSource) {
-        if (dataSource != null) {
-            for (DataTypeInterface type : dataTypes) {
-                type.setProvided(
-                    dataSource.provides(type.getType())
-                );
-
-                type.setEnabled(true);
-            }
+    public void dispatch (int eventType, Object data) {
+        switch (eventType) {
+            case MainController.USER_CLOSE_APP_EVENT:
+                terminate();
+                break;
         }
     }
+
+    protected void registerControllers () {
+        controllers.add(new MainController(dispatcher));
+        controllers.add(new DataController(dispatcher));
+    }
+
+    protected void registerEventTypes () {
+        try {
+            /*
+             * Triggered when all initialization is complete
+             */
+            dispatcher.register(APP_START_EVENT);
+
+            /*
+             * Triggered once the user has chosen to quit
+             */
+            dispatcher.register(APP_TERM_EVENT);
+
+            /*
+             * Triggered when the main frame has been created
+             */
+            dispatcher.register(MAIN_FRAME_CREATED_EVENT);
+
+            for (AbstractController controller : controllers)
+                controller.registerEventTypes(dispatcher);
+        } catch (Exception e) {
+            System.out.println("Dispatcher error: " + e.getMessage());
+        }
+    }
+
+    protected void registerEventListeners () {
+        try {
+            track(MainController.USER_CLOSE_APP_EVENT);
+
+            for (AbstractController controller : controllers)
+                controller.registerEventListeners(dispatcher);
+        } catch (Exception e) {
+            System.out.println("Dispatcher error: " + e.getMessage());
+        }
+    }
+
+    protected void terminate () {
+        emit(APP_TERM_EVENT);
+    }
+
+    // public void begin () {
+    //     /*
+    //      * This is the main frame which appears
+    //      */
+    //     AbstractMainFrame mainFrame = new MainFrame();
+
+    //     /*
+    //      * Controls the rendering of the main window Interface
+    //      */
+    //     mainController = new MainController(mainFrame);
+
+    //     /*
+    //      * The graph to display the data
+    //      */
+    //     AbstractGraphPanel graph = new GraphPanel();
+    //     mainController.useGraphPanel(graph);
+
+    //     /*
+    //      * Options regarding which data to display
+    //      */
+    //     AbstractDataSelectPanel dataSelect = new DataSelectPanel();
+    //     mainController.useDataSelectPanel(dataSelect);
+
+    //     /*
+    //      * Display for the most recent values of the data being displayed
+    //      */
+    //     AbstractLiveDataPanel liveData = new LiveDataPanel(dataTypes);
+    //     mainController.useLiveDataPanel(liveData);
+
+    //     /*
+    //      * Add the line panels to the graph
+    //      */
+    //     mainController.useLinePanels(getLinePanels());
+
+    //     /*
+    //      * Create the data controller and get the source
+    //      */
+    //     dataController = new DataController(dataTypes, mainFrame);
+
+    //     getDataSource();
+
+        
+    //      * Start collecting data
+         
+    //     dataController.start();
+
+    //     /*
+    //      * Start the application
+    //      */
+    //     mainController.start();
+    // }
+
+    // protected void registerDataType (String type, String units) {
+    //     DataTypeInterface collection = new DataType(type, units);
+
+    //     dataTypes.add(collection);
+    // }
+
+    // protected AbstractLinePanel[] getLinePanels () {
+    //     AbstractLinePanel[] panels = new AbstractLinePanel[dataTypes.size()];
+    //     int i = 0;
+
+    //     for (DataTypeInterface type : dataTypes)
+    //         panels[i++] = new LinePanel(type);
+
+    //     return panels;
+    // }
+
+    // protected void getDataSource () {
+    //     DataSourceInterface current;
+
+    //     if ((current = dataController.getDataSource()) != null) {
+    //         current.stop();
+    //     }
+
+    //     dataController.promptForDataSource();
+
+    //     checkDataTypes(dataController.getDataSource());
+    // }
+
+    // protected void checkDataTypes (DataSourceInterface dataSource) {
+    //     if (dataSource != null) {
+    //         for (DataTypeInterface type : dataTypes) {
+    //             type.setProvided(
+    //                 dataSource.provides(type.getType())
+    //             );
+
+    //             type.setEnabled(true);
+    //         }
+    //     }
+    // }
 }

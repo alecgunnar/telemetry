@@ -5,11 +5,11 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import gnu.io.SerialPortEventListener;
 import java.io.InputStream;
 
-interface ListenerInterface extends SerialPortEventListener {
+public interface ListenerInterface extends SerialPortEventListener {
     public void setInputStream(InputStream stream);
 }

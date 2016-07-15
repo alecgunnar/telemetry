@@ -5,8 +5,8 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
-abstract class AbstractLinePanel extends AbstractPanel {
+public abstract class AbstractLinePanel extends AbstractPanel {
     final public static int LINE_WIDTH = 1;
 }

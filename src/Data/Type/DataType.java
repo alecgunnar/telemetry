@@ -5,14 +5,14 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Color;
 
-class DataType implements DataTypeInterface {
+public class DataType implements DataTypeInterface {
     protected Color[] colors = {
         Color.GREEN,
         Color.BLUE,

@@ -22,7 +22,7 @@
 		<mkdir dir="${build.jar_dir}" />
 		<jar destfile="${build.jar_fqn}" basedir="${build.classes_dir}">
 			<manifest>
-				<attribute name="Main-Class" value="sunseeker.telemetry.Telemetry" />
+				<attribute name="Main-class" value="org.wmich.sunseeker.telemetry.Telemetry" />
 			</manifest>
 		</jar>
 	</target>

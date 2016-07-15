@@ -5,11 +5,11 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import javax.swing.JFrame;
 
-class TenCarDataSource extends AbstractSerialDataSource {
+public class TenCarDataSource extends AbstractSerialDataSource {
     public TenCarDataSource (AbstractDataTypeCollection types, JFrame parent) {
         super(types, parent);
 

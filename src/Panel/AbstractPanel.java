@@ -5,10 +5,10 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import javax.swing.JPanel;
 
-abstract class AbstractPanel extends JPanel {
+public abstract class AbstractPanel extends JPanel {
     
 }

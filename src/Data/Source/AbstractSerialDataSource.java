@@ -5,13 +5,13 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import java.io.IOException;
 
-abstract class AbstractSerialDataSource extends AbstractDataSource {
+public abstract class AbstractSerialDataSource extends AbstractDataSource {
     protected Helper helper;
     protected Client client;
 

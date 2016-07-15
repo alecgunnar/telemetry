@@ -5,7 +5,7 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.CommPort;
@@ -16,7 +16,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.Thread;
 
-class ModemConnection implements ConnectionInterface {
+public class ModemConnection implements ConnectionInterface {
     final protected static int TIMEOUT   = 3000;
     final protected static int BAUD_RATE = 9600;
 

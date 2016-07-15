@@ -5,11 +5,11 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import java.awt.Color;
 
-abstract class AbstractGraphPanel extends AbstractPanel {
+public abstract class AbstractGraphPanel extends AbstractPanel {
     final public static int AXIS_WIDTH   = 2;
     final public static int AXIS_INSET   = 30;
     final public static int FULL_INSET   = AXIS_WIDTH + AXIS_INSET;

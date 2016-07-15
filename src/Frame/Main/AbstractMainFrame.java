@@ -5,9 +5,9 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
-abstract class AbstractMainFrame extends AbstractFrame {
+public abstract class AbstractMainFrame extends AbstractFrame {
     final public static int FRAME_WIDTH   = 1000;
     final public static int FRAME_HEIGHT  = 700;
     final public static int PADDING      = 10;

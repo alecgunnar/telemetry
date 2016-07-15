@@ -5,7 +5,10 @@
 * @date July 8, 2016
 */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry.controller;
+
+import org.wmich.sunseeker.telemetry.dispatcher.Dispatcher;
+import org.wmich.sunseeker.telemetry.*;
 
 import javax.swing.JFrame;
 import java.util.ArrayList;
@@ -13,7 +16,13 @@ import java.util.HashMap;
 import java.lang.Thread;
 import javax.swing.JOptionPane;
 
-class DataController {
+public class DataController extends AbstractController {
+    /*
+     * Events triggered by this controller
+     */
+    final public static int NEW_DATA_VALUE_EVENT  = 0xA01;
+    final public static int NEW_DATA_SOURCE_EVENT = 0xA02;
+
     protected AbstractDataTypeCollection dataTypes;
 
     protected HashMap<String, DataSourceInterface> dataSources;
@@ -24,17 +33,8 @@ class DataController {
 
     protected JFrame parent;
 
-    public DataController (AbstractDataTypeCollection collections, JFrame frame) {
-        dataTypes = collections;
-        parent = frame;
-
-        dataSources = new HashMap<String, DataSourceInterface>();
-
-        /*
-         * Register the known data source types
-         */
-        registerDataSource(new PseudoRandomDataSource(dataTypes));
-        registerDataSource(new TenCarDataSource(dataTypes, parent));
+    public DataController (Dispatcher dispatcher) {
+        super(dispatcher);
     }
 
     public void start () {
@@ -79,6 +79,26 @@ class DataController {
 
     public DataSourceInterface getDataSource () {
         return dataSource;
+    }
+
+    public void registerEventTypes (Dispatcher dispatcher) throws Exception {
+        /*
+         * Triggered when a data set is ready
+         */
+        dispatcher.register(NEW_DATA_VALUE_EVENT);
+
+        /*
+         * Triggered when a new data source is chosen by the user
+         */
+        dispatcher.register(NEW_DATA_SOURCE_EVENT);
+    }
+
+    public void registerEventListeners (Dispatcher dispatcher) throws Exception {
+
+    }
+
+    public void dispatch (int eventType, Object data) {
+        
     }
 
     protected void registerDataSource (DataSourceInterface source) {

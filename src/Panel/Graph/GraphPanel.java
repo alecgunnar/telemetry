@@ -5,7 +5,7 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import javax.swing.JPanel;
 import java.awt.Graphics;
@@ -13,7 +13,7 @@ import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 
-class GraphPanel extends AbstractGraphPanel {
+public class GraphPanel extends AbstractGraphPanel {
     final protected int SCALE_HASH_SIZE = 1;
 
     protected Graphics2D artist;

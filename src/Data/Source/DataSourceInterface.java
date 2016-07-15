@@ -5,9 +5,9 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
-interface DataSourceInterface extends Runnable {
+public interface DataSourceInterface extends Runnable {
     public String getName();
 
     public String[] getTypes();

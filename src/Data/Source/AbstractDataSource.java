@@ -5,12 +5,12 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-abstract class AbstractDataSource implements DataSourceInterface {
+public abstract class AbstractDataSource implements DataSourceInterface {
     protected String[] providedTypes;
 
     protected HashMap<String, DataTypeInterface> types;

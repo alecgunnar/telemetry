@@ -5,14 +5,14 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import java.util.Random;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class PseudoRandomDataSource extends AbstractDataSource {
+public class PseudoRandomDataSource extends AbstractDataSource {
     protected Timer scheduler;
 
     protected Random randGen;
@@ -66,7 +66,7 @@ class PseudoRandomDataSource extends AbstractDataSource {
     }
 
     protected void scheduleTask () {
-        long delay = MainController.LINE_REFRESH_INTERVAL;
+        long delay = 250;
 
         final DataSourceInterface data = this;
 

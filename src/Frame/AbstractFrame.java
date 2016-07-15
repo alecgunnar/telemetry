@@ -5,11 +5,11 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import javax.swing.JFrame;
 
-abstract class AbstractFrame extends JFrame {
+public abstract class AbstractFrame extends JFrame {
     public void showFrame () {
         setVisible(true);
     }

@@ -5,7 +5,7 @@
  * @date July 2, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import javax.swing.JFrame;
 import javax.swing.SpringLayout;
@@ -15,7 +15,7 @@ import java.awt.Dimension;
 import java.awt.Container;
 import java.awt.Component;
 
-class MainFrame extends AbstractMainFrame {
+public class MainFrame extends AbstractMainFrame {
     protected SpringLayout layout;
 
     protected Container contentPane;

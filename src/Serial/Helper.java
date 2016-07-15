@@ -5,7 +5,7 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import java.util.HashMap;
 import java.util.Enumeration;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 
-class Helper {
+public class Helper {
     protected HashMap<String, CommPortIdentifier> ports;
 
     public Helper () {

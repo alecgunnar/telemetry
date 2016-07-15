@@ -5,12 +5,12 @@
  * @date July 9, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry;;
 
 import gnu.io.SerialPortEvent;
 import java.io.InputStream;
 
-class TenCarListener implements ListenerInterface {
+public class TenCarListener implements ListenerInterface {
     protected InputStream input;
 
     public void setInputStream (InputStream stream) {
