@@ -20,16 +20,15 @@ import java.util.HashMap;
 abstract class AbstractDataSource implements DataSource {
     protected List<NewDataListener> newDataListeners;
 
-    protected Map<Type, Unit> providedData;
+    protected Map<Type, Unit> provided;
 
     public AbstractDataSource () {
         newDataListeners = new ArrayList<NewDataListener>();
-        providedData     = new HashMap<Type, Unit>();
+        provided         = new HashMap<Type, Unit>();
     }
 
-    public String[] getProvided () {
-        String[] types = new String[providedData.size()];
-        return providedData.values().toArray(types);
+    public Map<Type, Unit> getProvided () {
+        return provided;
     }
 
     public void addListener (NewDataListener listener) {
@@ -51,6 +50,6 @@ abstract class AbstractDataSource implements DataSource {
     }
 
     protected void addProvidedType (Type type, Unit unit) {
-        providedData.put(type, unit);
+        provided.put(type, unit);
     }
 }
