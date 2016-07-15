@@ -15,13 +15,14 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class LinePanel extends AbstractLinePanel {
-    protected int width = 0;
-    protected int height = 0;
-
-    protected double previousValue;
-
+    /*
+     * Our artist
+     */
     protected Graphics2D artist;
 
+    /*
+     * List of points currently being displayed
+     */
     protected ArrayList<Integer> points;
 
     public LinePanel (DataTypeInterface data) {
@@ -53,9 +54,6 @@ public class LinePanel extends AbstractLinePanel {
 
     public void paintComponent (Graphics g) {
         super.paintComponent(g);
-
-        width = getWidth();
-        height = getHeight();
 
         artist = (Graphics2D) g;
 

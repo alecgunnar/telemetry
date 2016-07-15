@@ -27,7 +27,7 @@ public class MainFrame extends AbstractMainFrame implements ActionListener {
     /*
      * Delay between data view updates (in milliseconds)
      */
-    final protected int DATA_UPDATE_DELAY = 250;
+    final protected int DATA_UPDATE_DELAY = 125;
 
     /*
      * Layout of the frame
