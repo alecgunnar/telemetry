@@ -1,34 +1,56 @@
 /**
- * Sunseeker Telemetry
+ * Sunseeker Telemetry Application
  *
  * @author Alec Carpenter <alecgunnar@gmail.com>
- * @date July 9, 2016
+ * @date July 15, 2016
  */
 
-package sunseeker.telemetry;
+package org.wmich.sunseeker.telemetry.data.source;
 
-import java.util.Arrays;
+import org.wmich.sunseeker.telemetry.data.source.listener.NewDataListener;
+import org.wmich.sunseeker.telemetry.data.value.DataValue;
+import org.wmich.sunseeker.telemetry.data.Type;
+import org.wmich.sunseeker.telemetry.data.Unit;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 
-abstract class AbstractDataSource implements DataSourceInterface {
-    protected String[] providedTypes;
+abstract class AbstractDataSource implements DataSource {
+    protected List<NewDataListener> newDataListeners;
 
-    protected HashMap<String, DataTypeInterface> types;
+    protected Map<Type, Unit> providedData;
 
-    public AbstractDataSource (AbstractDataTypeCollection dataTypes) {
-        types = new HashMap<String, DataTypeInterface>();
-
-        for (DataTypeInterface type : dataTypes)
-            types.put(type.getType(), type);
+    public AbstractDataSource () {
+        newDataListeners = new ArrayList<NewDataListener>();
+        providedData     = new HashMap<Type, Unit>();
     }
 
-    public String[] getTypes () {
-        return providedTypes;
+    public String[] getProvided () {
+        String[] types = new String[providedData.size()];
+        return providedData.values().toArray(types);
     }
 
-    public boolean provides (String type) {
-        Arrays.sort(providedTypes);
+    public void addListener (NewDataListener listener) {
+        newDataListeners.add(listener);
+    }
 
-        return Arrays.binarySearch(providedTypes, type) >= 0;
+    public void removeListener (NewDataListener listener) {
+        newDataListeners.remove(listener);
+    }
+
+    public void sendNewData (DataValue data) {
+        for (NewDataListener listener : newDataListeners)
+            listener.receiveData(data);
+    }
+
+    public void restart () {
+        stop();
+        start();
+    }
+
+    protected void addProvidedType (Type type, Unit unit) {
+        providedData.put(type, unit);
     }
 }
