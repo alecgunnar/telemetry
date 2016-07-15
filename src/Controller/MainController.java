@@ -26,8 +26,6 @@ public class MainController extends AbstractController implements Runnable, Wind
     final public static int USER_CLOSE_APP_EVENT       = 100;
     final public static int USER_NEW_DATA_SOURCE_EVENT = 101;
 
-    final public static int LINE_REFRESH_INTERVAL = 250;
-
     /*
      * The application's main frame
      */
@@ -47,8 +45,7 @@ public class MainController extends AbstractController implements Runnable, Wind
     }
 
     public void start () {
-        if (!mainFrame.isVisible())
-            EventQueue.invokeLater(this);
+        EventQueue.invokeLater(this);
     }
 
     public void run () {
@@ -79,7 +76,7 @@ public class MainController extends AbstractController implements Runnable, Wind
         switch (eventType) {
             case DataController.NEW_DATA_SOURCE_EVENT:
                 mainFrame.useDataSource((DataSourceInterface) data);
-                start();
+                if (mainFrame != null && !mainFrame.isVisible()) start();
                 break;
             case DataController.NEW_DATA_SET_EVENT:
                 mainFrame.putData((DataSetInterface) data);
