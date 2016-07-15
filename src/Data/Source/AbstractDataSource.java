@@ -5,24 +5,25 @@
  * @date July 9, 2016
  */
 
-package org.wmich.sunseeker.telemetry;;
+package org.wmich.sunseeker.telemetry;
 
+import org.wmich.sunseeker.telemetry.data.DataSourceObserverInterface;
+import org.wmich.sunseeker.telemetry.data.DataSetInterface;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public abstract class AbstractDataSource implements DataSourceInterface {
-    protected String[] providedTypes;
+    protected ArrayList<DataSourceObserverInterface> observers;
 
-    protected HashMap<String, DataTypeInterface> types;
+    protected String[][] providedTypes;
 
-    public AbstractDataSource (AbstractDataTypeCollection dataTypes) {
-        types = new HashMap<String, DataTypeInterface>();
-
-        for (DataTypeInterface type : dataTypes)
-            types.put(type.getType(), type);
+    public AbstractDataSource () {
+        observers = new ArrayList<DataSourceObserverInterface>();
     }
 
-    public String[] getTypes () {
+    public String[][] getTypes () {
         return providedTypes;
     }
 
@@ -30,5 +31,18 @@ public abstract class AbstractDataSource implements DataSourceInterface {
         Arrays.sort(providedTypes);
 
         return Arrays.binarySearch(providedTypes, type) >= 0;
+    }
+
+    public void watch (DataSourceObserverInterface observer) {
+        observers.add(observer);
+    }
+
+    public void unwatch (DataSourceObserverInterface observer) {
+        observers.remove(observer);
+    }
+
+    protected void sendData (DataSetInterface data) {
+        for (DataSourceObserverInterface observer : observers)
+            observer.putData(data);
     }
 }

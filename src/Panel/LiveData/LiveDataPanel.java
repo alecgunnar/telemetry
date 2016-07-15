@@ -24,9 +24,10 @@ public class LiveDataPanel extends AbstractLiveDataPanel {
     protected JTable table;
     protected DefaultTableModel model;
 
-    public LiveDataPanel (AbstractDataTypeCollection dataTypes) {
-        types = dataTypes;
-
+    public LiveDataPanel () {
+        /*
+         * Create the titled border for the panel
+         */
         TitledBorder border = BorderFactory.createTitledBorder(" Live Data ");
 
         setBorder(border);
@@ -45,9 +46,8 @@ public class LiveDataPanel extends AbstractLiveDataPanel {
     public void refresh () {
         int row = model.getRowCount() - 1;
 
-        for (; row >= 0; row--) {
+        for (; row >= 0; row--)
             model.removeRow(row);
-        }
 
         addRows();
 
@@ -90,14 +90,16 @@ public class LiveDataPanel extends AbstractLiveDataPanel {
     }
 
     protected void addRows () {
-        for (DataTypeInterface type : types) {
-            if (type.isEnabled()) {
-                model.addRow(new Object[] {
-                    type.getType() + " (" + type.getUnits() + ")",
-                    (float) type.getMinimumValue(),
-                    (float) type.getCurrentValue(),
-                    (float) type.getMaximumValue()
-                });
+        if (types != null) {
+            for (DataTypeInterface type : types) {
+                if (type.isEnabled()) {
+                    model.addRow(new Object[] {
+                        type.getType() + " (" + type.getUnits() + ")",
+                        (float) type.getMinimumValue(),
+                        (float) type.getCurrentValue(),
+                        (float) type.getMaximumValue()
+                    });
+                }
             }
         }
     }

@@ -19,10 +19,10 @@ public class Telemetry extends AbstractController implements DispatchableInterfa
     /*
      * Events triggered at the application level
      */
-    final public static int APP_START_EVENT = 0x02;
-    final public static int APP_TERM_EVENT  = 0x00;
+    final public static int APP_START_EVENT = 2;
+    final public static int APP_TERM_EVENT  = 0;
 
-    final public static int MAIN_FRAME_CREATED_EVENT = 0x01;
+    final public static int MAIN_FRAME_CREATED_EVENT = 1;
 
     /*
      * The controllers to manage each part of the application
@@ -112,96 +112,4 @@ public class Telemetry extends AbstractController implements DispatchableInterfa
     protected void terminate () {
         emit(APP_TERM_EVENT);
     }
-
-    // public void begin () {
-    //     /*
-    //      * This is the main frame which appears
-    //      */
-    //     AbstractMainFrame mainFrame = new MainFrame();
-
-    //     /*
-    //      * Controls the rendering of the main window Interface
-    //      */
-    //     mainController = new MainController(mainFrame);
-
-    //     /*
-    //      * The graph to display the data
-    //      */
-    //     AbstractGraphPanel graph = new GraphPanel();
-    //     mainController.useGraphPanel(graph);
-
-    //     /*
-    //      * Options regarding which data to display
-    //      */
-    //     AbstractDataSelectPanel dataSelect = new DataSelectPanel();
-    //     mainController.useDataSelectPanel(dataSelect);
-
-    //     /*
-    //      * Display for the most recent values of the data being displayed
-    //      */
-    //     AbstractLiveDataPanel liveData = new LiveDataPanel(dataTypes);
-    //     mainController.useLiveDataPanel(liveData);
-
-    //     /*
-    //      * Add the line panels to the graph
-    //      */
-    //     mainController.useLinePanels(getLinePanels());
-
-    //     /*
-    //      * Create the data controller and get the source
-    //      */
-    //     dataController = new DataController(dataTypes, mainFrame);
-
-    //     getDataSource();
-
-        
-    //      * Start collecting data
-         
-    //     dataController.start();
-
-    //     /*
-    //      * Start the application
-    //      */
-    //     mainController.start();
-    // }
-
-    // protected void registerDataType (String type, String units) {
-    //     DataTypeInterface collection = new DataType(type, units);
-
-    //     dataTypes.add(collection);
-    // }
-
-    // protected AbstractLinePanel[] getLinePanels () {
-    //     AbstractLinePanel[] panels = new AbstractLinePanel[dataTypes.size()];
-    //     int i = 0;
-
-    //     for (DataTypeInterface type : dataTypes)
-    //         panels[i++] = new LinePanel(type);
-
-    //     return panels;
-    // }
-
-    // protected void getDataSource () {
-    //     DataSourceInterface current;
-
-    //     if ((current = dataController.getDataSource()) != null) {
-    //         current.stop();
-    //     }
-
-    //     dataController.promptForDataSource();
-
-    //     checkDataTypes(dataController.getDataSource());
-    // }
-
-    // protected void checkDataTypes (DataSourceInterface dataSource) {
-    //     if (dataSource != null) {
-    //         for (DataTypeInterface type : dataTypes) {
-    //             type.setProvided(
-    //                 dataSource.provides(type.getType())
-    //             );
-
-    //             type.setEnabled(true);
-    //         }
-    //     }
-    // }
 }

@@ -12,6 +12,9 @@ import javax.swing.border.TitledBorder;
 
 public class DataSelectPanel extends AbstractDataSelectPanel {
     public DataSelectPanel () {
+        /*
+         * Create the titled border for the panel
+         */
         TitledBorder border = BorderFactory.createTitledBorder(" Available Data ");
 
         setBorder(border);

@@ -8,6 +8,8 @@
 package org.wmich.sunseeker.telemetry.controller;
 
 import org.wmich.sunseeker.telemetry.dispatcher.Dispatcher;
+import org.wmich.sunseeker.telemetry.data.DataSourceObserverInterface;
+import org.wmich.sunseeker.telemetry.data.DataSetInterface;
 import org.wmich.sunseeker.telemetry.*;
 
 import javax.swing.JFrame;
@@ -16,12 +18,12 @@ import java.util.HashMap;
 import java.lang.Thread;
 import javax.swing.JOptionPane;
 
-public class DataController extends AbstractController {
+public class DataController extends AbstractController implements DataSourceObserverInterface {
     /*
      * Events triggered by this controller
      */
-    final public static int NEW_DATA_VALUE_EVENT  = 0xA01;
-    final public static int NEW_DATA_SOURCE_EVENT = 0xA02;
+    final public static int NEW_DATA_SET_EVENT    = 200;
+    final public static int NEW_DATA_SOURCE_EVENT = 201;
 
     protected AbstractDataTypeCollection dataTypes;
 
@@ -35,6 +37,11 @@ public class DataController extends AbstractController {
 
     public DataController (Dispatcher dispatcher) {
         super(dispatcher);
+
+        dataSources = new HashMap<String, DataSourceInterface>();
+
+        registerDataSource(new PseudoRandomDataSource());
+        registerDataSource(new TenCarDataSource());
     }
 
     public void start () {
@@ -50,11 +57,13 @@ public class DataController extends AbstractController {
     }
 
     public void stop () {
-        try {
-            dataSource.stop();
-            dataThread.join();
-        } catch (InterruptedException e) {
-            System.out.println("Could not stop the data source thread...");
+        if (dataSource != null) {
+            try {
+                dataSource.stop();
+                dataThread.join();
+            } catch (InterruptedException e) {
+                System.out.println("Could not stop the data source thread...");
+            }
         }
     }
 
@@ -64,6 +73,14 @@ public class DataController extends AbstractController {
     }
 
     public void promptForDataSource () {
+        /*
+         * Stop collecing data
+         */
+        stop();
+
+        /*
+         * Present the available data sources in a menu to the user
+         */
         String source = (String) JOptionPane.showInputDialog(
             parent,
             "Choose a source for the data:",
@@ -74,18 +91,40 @@ public class DataController extends AbstractController {
             dataSource
         );
 
-        dataSource = dataSources.get(source);
+        /*
+         * Update the data source to the one selected by the user
+         */
+        if (source != null) {
+            /*
+             * If we already have a data source unsubscribe from it
+             */
+            if (dataSource != null)
+                dataSource.unwatch(this);
+
+            dataSource = dataSources.get(source);
+            dataSource.watch(this);
+
+            emit(NEW_DATA_SOURCE_EVENT, dataSource);
+        } else if (dataSource == null) {
+            /*
+             * If no data source is selected, force one to be
+             */
+            promptForDataSource();
+
+            return;
+        }
+
+        /*
+         * Resume collecting data
+         */
+        start();
     }
 
-    public DataSourceInterface getDataSource () {
-        return dataSource;
-    }
-
-    public void registerEventTypes (Dispatcher dispatcher) throws Exception {
+    public void registerEventTypes (Dispatcher dispatcher) throws RuntimeException {
         /*
          * Triggered when a data set is ready
          */
-        dispatcher.register(NEW_DATA_VALUE_EVENT);
+        dispatcher.register(NEW_DATA_SET_EVENT);
 
         /*
          * Triggered when a new data source is chosen by the user
@@ -93,12 +132,23 @@ public class DataController extends AbstractController {
         dispatcher.register(NEW_DATA_SOURCE_EVENT);
     }
 
-    public void registerEventListeners (Dispatcher dispatcher) throws Exception {
-
+    public void registerEventListeners () {
+        track(Telemetry.APP_START_EVENT);
     }
 
     public void dispatch (int eventType, Object data) {
-        
+        switch (eventType) {
+            /*
+             * When the app starts, prompt the user to pick a data source
+             */
+            case Telemetry.APP_START_EVENT:
+                promptForDataSource();
+                break;
+        }
+    }
+
+    public void putData (DataSetInterface dataSet) {
+        emit(NEW_DATA_SET_EVENT, dataSet);
     }
 
     protected void registerDataSource (DataSourceInterface source) {

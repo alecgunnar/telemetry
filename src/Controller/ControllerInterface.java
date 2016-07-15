@@ -11,7 +11,7 @@ import org.wmich.sunseeker.telemetry.dispatcher.Dispatcher;
 import org.wmich.sunseeker.telemetry.dispatcher.DispatchableInterface;
 
 public interface ControllerInterface {
-    public void registerEventTypes (Dispatcher dispatcher) throws Exception;
+    public void registerEventTypes (Dispatcher dispatcher) throws RuntimeException;
 
-    public void registerEventListeners (Dispatcher dispatcher) throws Exception;
+    public void registerEventListeners (Dispatcher dispatcher) throws RuntimeException;
 }

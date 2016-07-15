@@ -9,4 +9,6 @@ package org.wmich.sunseeker.telemetry;;
 
 public abstract class AbstractLinePanel extends AbstractPanel {
     final public static int LINE_WIDTH = 1;
+
+    abstract public void putValue(double value);
 }

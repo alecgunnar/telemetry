@@ -10,6 +10,7 @@ package org.wmich.sunseeker.telemetry;;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -21,18 +22,9 @@ public class LinePanel extends AbstractLinePanel {
 
     protected Graphics2D artist;
 
-    protected boolean active = true;
-
-    protected DataTypeInterface data;
-
     protected ArrayList<Integer> points;
 
     public LinePanel (DataTypeInterface data) {
-        /*
-         * This is where we will be getting the data from
-         */
-        this.data = data;
-
         /*
          * Need to see the other lines and graph
          */
@@ -42,6 +34,21 @@ public class LinePanel extends AbstractLinePanel {
          * Initialize the collection of points
          */
         points = new ArrayList<Integer>();
+
+        /*
+         * To draw the segments, we need a point to start from
+         */
+        points.add(AbstractGraphPanel.getYPos(0));
+    }
+
+    public void putValue (double value) {
+        /*
+         * If we have too many points, remove one
+         */
+        if (points.size() > AbstractGraphPanel.MAX_POINTS)
+            points.remove(0);
+
+        points.add(AbstractGraphPanel.getYPos(value));
     }
 
     public void paintComponent (Graphics g) {
@@ -55,29 +62,7 @@ public class LinePanel extends AbstractLinePanel {
         /*
          * Only when this line is active should it be drawn
          */
-        if (data.isEnabled()) {
-            loadPoints();
-
-            drawSegments();
-        }
-    }
-
-    protected void loadPoints () {
-        List<Double> data = this.data.getData();
-
-        for (Double value : data)
-            pushPoint(AbstractGraphPanel.getYPos(previousValue = value));
-
-        if (data.size() == 0)
-            pushPoint(AbstractGraphPanel.getYPos(previousValue));
-    }
-
-    protected void pushPoint (Integer point) {
-        if (points.size() == AbstractGraphPanel.MAX_POINTS) {
-            points.remove(0);
-        }
-
-        points.add(point);
+        drawSegments();
     }
 
     protected void drawSegments () {
@@ -90,7 +75,7 @@ public class LinePanel extends AbstractLinePanel {
             BasicStroke.JOIN_MITER
         ));
 
-        artist.setColor(data.getColor());
+        artist.setColor(Color.BLACK);
 
         /*
          * Run through the data to be displayed

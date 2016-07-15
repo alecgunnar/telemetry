@@ -5,7 +5,10 @@
  * @date July 2, 2016
  */
 
-package org.wmich.sunseeker.telemetry;;
+package org.wmich.sunseeker.telemetry;
+
+import org.wmich.sunseeker.telemetry.data.DataSetInterface;
+import org.wmich.sunseeker.telemetry.data.DataSet;
 
 import java.util.Random;
 import java.util.List;
@@ -19,36 +22,29 @@ public class PseudoRandomDataSource extends AbstractDataSource {
 
     protected boolean scheduled;
 
-    public PseudoRandomDataSource (AbstractDataTypeCollection dataTypes) {
-        super(dataTypes);
-
+    public PseudoRandomDataSource () {
         scheduler = new Timer();
         randGen   = new Random();
 
-        providedTypes = new String[] {
-            "speed", "voltage", "current", "array"
+        providedTypes = new String[][] {
+            {"speed", "mph"},
+            {"voltage", "volts"},
+            {"current", "amps"},
+            {"array", "watts"}
         };
     }
 
     public String getName () {
-        return "Pseudo Random Data Source";
+        return "Pseudo Random Number Generator";
     }
 
     public void run () {
-        List<Double> data;
-        double val;
+        DataSetInterface data = new DataSet();
 
-        for (String type : providedTypes) {
-            if (!types.containsKey(type))
-                continue;
+        for (String[] type : providedTypes)
+            data.put(type[0], 500 * ((randGen.nextDouble() * 2) - 1));
 
-            data = types.get(type).getData();
-
-            val = 500 * ((randGen.nextDouble() * 2) - 1);
-
-            data.clear();
-            types.get(type).putValue(val);
-        }
+        sendData(data);
 
         if (!scheduled)
             scheduleTask();

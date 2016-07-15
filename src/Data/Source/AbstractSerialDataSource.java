@@ -7,31 +7,27 @@
 
 package org.wmich.sunseeker.telemetry;;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import java.io.IOException;
 
 public abstract class AbstractSerialDataSource extends AbstractDataSource {
     protected Helper helper;
-    protected Client client;
+    protected Client client; 
 
-    protected JFrame parent;
+    public AbstractSerialDataSource () {
+        super();
 
-    public AbstractSerialDataSource (AbstractDataTypeCollection types, JFrame frame) {
-        super(types);
-
-        parent = frame;
         client = getClient();
         helper = new Helper();
     }
 
     public void run () {
-        promptForSerialPort(parent);
+        promptForSerialPort();
     }
 
-    protected boolean promptForSerialPort (JFrame parent) {
+    protected boolean promptForSerialPort () {
         String port = (String) JOptionPane.showInputDialog(
-            parent,
+            null,
             "Choose which serial port you would like to connect to:",
             "Choose a Serial Port",
             JOptionPane.PLAIN_MESSAGE,

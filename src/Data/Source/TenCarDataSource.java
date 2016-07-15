@@ -10,16 +10,14 @@ package org.wmich.sunseeker.telemetry;;
 import javax.swing.JFrame;
 
 public class TenCarDataSource extends AbstractSerialDataSource {
-    public TenCarDataSource (AbstractDataTypeCollection types, JFrame parent) {
-        super(types, parent);
-
-        providedTypes = new String[] {
-            "speed"
+    public TenCarDataSource () {
+        providedTypes = new String[][] {
+            {"speed", "mph"}
         };
     }
 
     public String getName () {
-        return "2010 Car Data Source";
+        return "2010 Sunseeker Solar Car";
     }
 
     protected Client getClient () {

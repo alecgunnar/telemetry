@@ -8,73 +8,52 @@
 package org.wmich.sunseeker.telemetry.controller;
 
 import org.wmich.sunseeker.telemetry.dispatcher.Dispatcher;
+import org.wmich.sunseeker.telemetry.data.DataSetInterface;
 import org.wmich.sunseeker.telemetry.*;
 
 import javax.swing.JFrame;
 import java.lang.Runnable;
 import java.lang.Thread;
 import java.awt.EventQueue;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.Timer;
 
-public class MainController extends AbstractController implements Runnable, ActionListener {
+public class MainController extends AbstractController implements Runnable {
     /*
      * Define events triggered by this controller
      */
-    final public static int USER_CLOSE_APP_EVENT       = 0xB00;
-    final public static int USER_NEW_DATA_SOURCE_EVENT = 0xB01;
+    final public static int USER_CLOSE_APP_EVENT       = 100;
+    final public static int USER_NEW_DATA_SOURCE_EVENT = 101;
 
     final public static int LINE_REFRESH_INTERVAL = 250;
 
+    /*
+     * The application's main frame
+     */
     protected AbstractMainFrame mainFrame;
 
+    /*
+     * The various panels added to the main frame
+     */
     protected AbstractGraphPanel graphPanel;
-
     protected AbstractLiveDataPanel liveDataPanel;
-
-    protected boolean paused = false;
-
-    protected Timer lineUpdater;
+    protected AbstractDataSelectPanel dataSelectPanel;
 
     public MainController (Dispatcher dispatcher) {
         super(dispatcher);
+
+        initializePanels();
     }
 
-    // public void useGraphPanel (AbstractGraphPanel panel) {
-    //     mainFrame.useGraphPanel(graphPanel = panel);
-    // }
-
-    // public void useDataSelectPanel (AbstractDataSelectPanel panel) {
-    //     mainFrame.useDataSelectPanel(panel);
-    // }
-
-    // public void useLiveDataPanel (AbstractLiveDataPanel panel) {
-    //     mainFrame.useLiveDataPanel(liveDataPanel = panel);
-    // }
-
-    // public void useLinePanels(AbstractLinePanel[] panels) {
-    //     mainFrame.useLinePanels(panels);
-
-    //     createLineUpdater();
-    // }
-
     public void start () {
-        EventQueue.invokeLater(this);
+        if (!mainFrame.isVisible())
+            EventQueue.invokeLater(this);
     }
 
     public void run () {
         mainFrame.showFrame();
-
-        // lineUpdater.start();
     }
 
-    public void actionPerformed (ActionEvent evt) {
-        graphPanel.repaint();
-        liveDataPanel.refresh();
-    }
-
-    public void registerEventTypes (Dispatcher dispatcher) throws Exception {
+    public void registerEventTypes (Dispatcher dispatcher) throws RuntimeException {
         /*
          * Triggered when the user closed the main frame
          */
@@ -86,19 +65,50 @@ public class MainController extends AbstractController implements Runnable, Acti
         dispatcher.register(USER_NEW_DATA_SOURCE_EVENT);
     }
 
-    public void registerEventListeners (Dispatcher dispatcher) throws Exception {
+    public void registerEventListeners () {
         track(Telemetry.APP_START_EVENT);
         track(Telemetry.MAIN_FRAME_CREATED_EVENT);
+
+        track(DataController.NEW_DATA_SOURCE_EVENT);
+        track(DataController.NEW_DATA_SET_EVENT);
     }
 
     public void dispatch (int eventType, Object data) {
         switch (eventType) {
-            case Telemetry.APP_START_EVENT: start(); break;
-            case Telemetry.MAIN_FRAME_CREATED_EVENT: mainFrame = (AbstractMainFrame) data; break;
+            case DataController.NEW_DATA_SOURCE_EVENT:
+                mainFrame.useDataSource((DataSourceInterface) data);
+                start();
+                break;
+            case DataController.NEW_DATA_SET_EVENT:
+                mainFrame.putData((DataSetInterface) data);
+                break;
+            case Telemetry.MAIN_FRAME_CREATED_EVENT:
+                mainFrame = (AbstractMainFrame) data;
+                setupMainFrame();
+                break;
         }
     }
 
-    protected void createLineUpdater () {
-        lineUpdater = new Timer(LINE_REFRESH_INTERVAL, this);
+    protected void initializePanels () {
+        /*
+         * The graph to display the data
+         */
+        graphPanel = new GraphPanel();
+
+        /*
+         * Display for the most recent values of the data being displayed
+         */
+        liveDataPanel = new LiveDataPanel();
+
+        /*
+         * Configure which data is shown in the main frame
+         */
+        dataSelectPanel = new DataSelectPanel();
+    }
+
+    protected void setupMainFrame () {
+        mainFrame.useGraphPanel(graphPanel);
+        mainFrame.useLiveDataPanel(liveDataPanel);
+        mainFrame.useDataSelectPanel(dataSelectPanel);
     }
 }

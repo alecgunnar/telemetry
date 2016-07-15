@@ -17,16 +17,20 @@ public abstract class AbstractController implements ControllerInterface, Dispatc
         this.dispatcher = dispatcher;
     }
 
-    public void registerEventTypes (Dispatcher dispatcher) throws Exception {
-        /*
-         * Nothing to emit
-         */
+    public void registerEventTypes (Dispatcher dispatcher) throws RuntimeException {
+        registerEventTypes();
     }
 
-    public void registerEventListeners (Dispatcher dispatcher) throws Exception {
-        /*
-         * Nothing to listen for
-         */
+    public void registerEventListeners (Dispatcher dispatcher) throws RuntimeException {
+        registerEventListeners();
+    }
+
+    protected void registerEventTypes () {
+
+    }
+
+    protected void registerEventListeners () {
+
     }
 
     public void dispatch (int eventType, Object data) {
@@ -38,16 +42,18 @@ public abstract class AbstractController implements ControllerInterface, Dispatc
     protected void emit (int eventType, Object data) {
         try {
             dispatcher.trigger(eventType, data);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("Cannot emit event: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     protected void track (int eventType) {
         try {
             dispatcher.listen(eventType, this);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("Cannot listen to event: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

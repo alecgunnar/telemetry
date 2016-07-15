@@ -5,7 +5,10 @@
  * @date July 2, 2016
  */
 
-package org.wmich.sunseeker.telemetry;;
+package org.wmich.sunseeker.telemetry;
+
+import org.wmich.sunseeker.telemetry.data.DataSetInterface;
+import org.wmich.sunseeker.telemetry.*;
 
 public abstract class AbstractMainFrame extends AbstractFrame {
     final public static int FRAME_WIDTH   = 1000;
@@ -19,5 +22,7 @@ public abstract class AbstractMainFrame extends AbstractFrame {
 
     abstract public void useLiveDataPanel(AbstractLiveDataPanel panel);
 
-    abstract public void useLinePanels(AbstractLinePanel[] panels);
+    abstract public void useDataSource(DataSourceInterface dataSource);
+
+    abstract public void putData(DataSetInterface dataSet);
 }
