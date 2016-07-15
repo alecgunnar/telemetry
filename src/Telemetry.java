@@ -111,5 +111,7 @@ public class Telemetry extends AbstractController implements DispatchableInterfa
 
     protected void terminate () {
         emit(APP_TERM_EVENT);
+
+        System.exit(0);
     }
 }

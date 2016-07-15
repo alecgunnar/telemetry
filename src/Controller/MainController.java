@@ -12,12 +12,14 @@ import org.wmich.sunseeker.telemetry.data.DataSetInterface;
 import org.wmich.sunseeker.telemetry.*;
 
 import javax.swing.JFrame;
+import javax.swing.Timer;
+import java.awt.EventQueue;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
 import java.lang.Runnable;
 import java.lang.Thread;
-import java.awt.EventQueue;
-import javax.swing.Timer;
 
-public class MainController extends AbstractController implements Runnable {
+public class MainController extends AbstractController implements Runnable, WindowListener {
     /*
      * Define events triggered by this controller
      */
@@ -83,10 +85,67 @@ public class MainController extends AbstractController implements Runnable {
                 mainFrame.putData((DataSetInterface) data);
                 break;
             case Telemetry.MAIN_FRAME_CREATED_EVENT:
-                mainFrame = (AbstractMainFrame) data;
-                setupMainFrame();
+                setupMainFrame((AbstractMainFrame) data);
                 break;
         }
+    }
+
+    public void windowActivated (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowClosing (WindowEvent windowEvent) {
+        emit(USER_CLOSE_APP_EVENT);
+    }
+
+    public void windowClosed (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowDeactivated (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowDeiconified (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowGainedFocus (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowIconified (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowLostFocus (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowOpened (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
+    }
+
+    public void windowStateChanged (WindowEvent e) {
+        /*
+         * Unchecked event
+         */
     }
 
     protected void initializePanels () {
@@ -106,9 +165,19 @@ public class MainController extends AbstractController implements Runnable {
         dataSelectPanel = new DataSelectPanel();
     }
 
-    protected void setupMainFrame () {
+    protected void setupMainFrame (AbstractMainFrame frame) {
+        mainFrame = frame;
+
+        /*
+         * Configure the frame to use the various panels
+         */
         mainFrame.useGraphPanel(graphPanel);
         mainFrame.useLiveDataPanel(liveDataPanel);
         mainFrame.useDataSelectPanel(dataSelectPanel);
+
+        /*
+         * Listen to the frame closing
+         */
+        mainFrame.addWindowListener(this);
     }
 }

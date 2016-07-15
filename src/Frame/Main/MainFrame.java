@@ -221,44 +221,6 @@ public class MainFrame extends AbstractMainFrame implements ActionListener {
         timer.start();
     }
 
-    protected void processLinePanels (String[][] types) {
-        /*
-         * Go through each type and create a line panel for it, then
-         * add the panel to the map
-         */
-        for (String[] type : types)
-            linePanels.put(type[0], new LinePanel(new DataType(type[0], type[1])));
-    }
-
-    protected void addLinePanelsOverGraph () {
-        /*
-         * For each of the line panels, position it on the graph
-         */
-        for (AbstractLinePanel panel : linePanels.values()) {
-            panel.setBounds(
-                AbstractGraphPanel.AXIS_INSET, 0,
-                FRAME_WIDTH - AbstractGraphPanel.FULL_INSET,
-                AbstractGraphPanel.PANEL_HEIGHT
-            );
-
-            layeredPane.add(panel, new Integer(depth++));
-        }
-    }
-
-    protected void removeLinePanels () {
-        /*
-         * If some line panels exist, remove them
-         */
-        if (linePanels.size() > 0) {
-            /*
-             * Be sure to decrement the depth!
-             */
-            depth -= linePanels.size();
-
-            linePanels.clear();
-        }
-    }
-
     public void putData (DataSetInterface dataSet) {
         this.dataSet = dataSet;
     }
@@ -340,5 +302,43 @@ public class MainFrame extends AbstractMainFrame implements ActionListener {
         );
 
         dataPanelsWidth += width;
+    }
+
+    protected void processLinePanels (String[][] types) {
+        /*
+         * Go through each type and create a line panel for it, then
+         * add the panel to the map
+         */
+        for (String[] type : types)
+            linePanels.put(type[0], new LinePanel(new DataType(type[0], type[1])));
+    }
+
+    protected void addLinePanelsOverGraph () {
+        /*
+         * For each of the line panels, position it on the graph
+         */
+        for (AbstractLinePanel panel : linePanels.values()) {
+            panel.setBounds(
+                AbstractGraphPanel.AXIS_INSET, 0,
+                FRAME_WIDTH - AbstractGraphPanel.FULL_INSET,
+                AbstractGraphPanel.PANEL_HEIGHT
+            );
+
+            layeredPane.add(panel, new Integer(depth++));
+        }
+    }
+
+    protected void removeLinePanels () {
+        /*
+         * If some line panels exist, remove them
+         */
+        if (linePanels.size() > 0) {
+            /*
+             * Be sure to decrement the depth!
+             */
+            depth -= linePanels.size();
+
+            linePanels.clear();
+        }
     }
 }
