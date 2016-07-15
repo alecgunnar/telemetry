@@ -10,11 +10,15 @@ package org.wmich.sunseeker.telemetry;;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
 public class LinePanel extends AbstractLinePanel {
+    /*
+     * The data type being displayed
+     */
+    protected DataTypeInterface data;
+
     /*
      * Our artist
      */
@@ -26,6 +30,8 @@ public class LinePanel extends AbstractLinePanel {
     protected ArrayList<Integer> points;
 
     public LinePanel (DataTypeInterface data) {
+        this.data = data;
+
         /*
          * Need to see the other lines and graph
          */
@@ -73,7 +79,7 @@ public class LinePanel extends AbstractLinePanel {
             BasicStroke.JOIN_MITER
         ));
 
-        artist.setColor(Color.BLACK);
+        artist.setColor(data.getColor());
 
         /*
          * Run through the data to be displayed

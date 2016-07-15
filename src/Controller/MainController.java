@@ -90,61 +90,61 @@ public class MainController extends AbstractController implements Runnable, Wind
         }
     }
 
-    public void windowActivated (WindowEvent e) {
-        /*
-         * Unchecked event
-         */
+    public void windowClosing (WindowEvent e) {
+        emit(USER_CLOSE_APP_EVENT);
     }
 
-    public void windowClosing (WindowEvent windowEvent) {
-        emit(USER_CLOSE_APP_EVENT);
+    public void windowActivated (WindowEvent e) {
+        /*
+         * Don't care...
+         */
     }
 
     public void windowClosed (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowDeactivated (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowDeiconified (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowGainedFocus (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowIconified (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowLostFocus (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowOpened (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
     public void windowStateChanged (WindowEvent e) {
         /*
-         * Unchecked event
+         * Don't care...
          */
     }
 
@@ -176,7 +176,7 @@ public class MainController extends AbstractController implements Runnable, Wind
         mainFrame.useDataSelectPanel(dataSelectPanel);
 
         /*
-         * Listen to the frame closing
+         * Listen to the frame
          */
         mainFrame.addWindowListener(this);
     }
