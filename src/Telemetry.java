@@ -7,16 +7,22 @@
 
 package org.wmich.sunseeker.telemetry;
 
-import org.wmich.sunseeker.telemetry.gui.frame.MainFrame;
-import org.wmich.sunseeker.telemetry.gui.menu.MainMenu;
-import org.wmich.sunseeker.telemetry.gui.dialog.ChooseDataSourceDialog;
+import org.wmich.sunseeker.telemetry.gui.component.frame.MainFrame;
+import org.wmich.sunseeker.telemetry.gui.component.menu.MainMenu;
+import org.wmich.sunseeker.telemetry.gui.component.dialog.ChooseDataSource;
+import org.wmich.sunseeker.telemetry.gui.component.dialog.SelectableDataSource;
 import org.wmich.sunseeker.telemetry.gui.event.MainFrameInitializer;
+import org.wmich.sunseeker.telemetry.data.source.DataSource;
+import org.wmich.sunseeker.telemetry.data.source.PseudoRandom;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 
 public class Telemetry {
     protected MainFrame mainFrame;
     protected MainMenu mainMenu;
+
+    protected ChooseDataSource dataSourceDialog;
 
     public static void main (String[] args) {
         Telemetry telemetry = new Telemetry();
@@ -28,11 +34,19 @@ public class Telemetry {
         mainFrame = new MainFrame();
         mainMenu  = new MainMenu();
 
+        dataSourceDialog = new SelectableDataSource();
+
         configureMenubar();
     }
 
     public void start () {
-        EventQueue.invokeLater(new MainFrameInitializer(mainFrame));
+        ArrayList<DataSource> sources = new ArrayList<DataSource>();
+
+        sources.add(new PseudoRandom());
+
+        dataSourceDialog.prompt(sources);
+
+        // EventQueue.invokeLater(new MainFrameInitializer(mainFrame));
     }
 
     protected void configureMenubar () {

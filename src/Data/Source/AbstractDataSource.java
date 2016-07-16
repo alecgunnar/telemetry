@@ -52,4 +52,8 @@ abstract class AbstractDataSource implements DataSource {
     protected void addProvidedType (Type type, Unit unit) {
         provided.put(type, unit);
     }
+
+    public String toString () {
+        return getName();
+    }
 }

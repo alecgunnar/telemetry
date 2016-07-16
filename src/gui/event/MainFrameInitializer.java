@@ -7,7 +7,7 @@
 
 package org.wmich.sunseeker.telemetry.gui.event;
 
-import org.wmich.sunseeker.telemetry.gui.frame.MainFrame;
+import org.wmich.sunseeker.telemetry.gui.component.frame.MainFrame;
 
 import java.lang.Runnable;
 

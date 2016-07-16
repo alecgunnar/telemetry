@@ -5,7 +5,7 @@
  * @date July 15, 2016
  */
 
-package org.wmich.sunseeker.telemetry.gui.menu;
+package org.wmich.sunseeker.telemetry.gui.component.menu;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;

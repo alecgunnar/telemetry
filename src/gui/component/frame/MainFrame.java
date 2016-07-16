@@ -5,7 +5,7 @@
  * @date July 15, 2016
  */
 
-package org.wmich.sunseeker.telemetry.gui.frame;
+package org.wmich.sunseeker.telemetry.gui.component.frame;
 
 import javax.swing.JFrame;
 import java.awt.Dimension;
