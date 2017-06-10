@@ -21,6 +21,8 @@ class ModemConnection implements ConnectionInterface {
     final protected static int BAUD_RATE = 9600;
     final protected static int CHANNEL   = 786;
 
+    private BufferedWriter output;
+
     public CommPort getConnection(CommPortIdentifier port) throws PortInUseException, UnsupportedCommOperationException {
         CommPort comm;
 
@@ -41,18 +43,13 @@ class ModemConnection implements ConnectionInterface {
     }
 
     public void set (BufferedWriter out) throws IOException {
-        out.write("+++");
-        out.flush();
+        output = out;
 
-        try {
-            Thread.sleep(1000);
-        } catch (Exception e) { }
-
-        out.write("ATAM\n\r");
-        out.write("ATMY " + CHANNEL + "\n\r");
-        out.write("ATDT " + CHANNEL + "\n\r");
-        out.write("ATCN\n\r");
-        out.flush();
+        send("+++");
+        sendCommand("ATAM");
+        sendCommand("ATMY " + CHANNEL);
+        sendCommand("ATDT " + CHANNEL);
+        sendCommand("ATCN");
     }
 
     public void reset (BufferedWriter out) throws IOException {
@@ -61,5 +58,24 @@ class ModemConnection implements ConnectionInterface {
 
     public void unset (BufferedWriter out) throws IOException {
 
+    }
+
+    private void send(String msg) throws IOException {
+        System.out.print(msg);
+
+        output.write(msg);
+        output.flush();
+
+        waitASecond();
+    }
+
+    private void sendCommand(String command) throws IOException {
+        send(command + "\n\r");
+    }
+
+    private void waitASecond() {
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) { }
     }
 }

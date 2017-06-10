@@ -64,7 +64,7 @@ class SixteenCarDataSource extends AbstractSerialDataSource implements DataProce
     protected void registerDataTypes () {
         registerDataMapping(
             MC1BUS,
-            registerDataType("MC 1 Bus Current", "Amps"),
+            registerDataType("MC 1 Bus Current", "mA"),
             registerDataType("MC 1 Bus Voltage", "Volts")
         );
 
@@ -136,7 +136,7 @@ class SixteenCarDataSource extends AbstractSerialDataSource implements DataProce
 
         registerDataMapping(
             MC2BUS,
-            registerDataType("MC 2 Bus Current", "Amps"),
+            registerDataType("MC 2 Bus Current", "mA"),
             registerDataType("MC 2 Bus Voltage", "Volts")
         );
 
@@ -233,7 +233,7 @@ class SixteenCarDataSource extends AbstractSerialDataSource implements DataProce
         registerDataMapping(
             BP_TMX,
             registerDataType("Maximum Tempurature", "deg C"),
-            registerDataType("Maximum Tempurature Cell", "deg C")
+            registerDataType("Maximum Tempurature Cell", "deg F")
         );
 
         registerDataMapping(

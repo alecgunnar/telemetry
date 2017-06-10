@@ -48,6 +48,8 @@ class GenericListener extends AbstractListener {
     protected void putData (String data) {
         int offset;
 
+        System.out.println(data);
+
         buffer += data;
 
         switch (bufferState) {
