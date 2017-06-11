@@ -59,9 +59,6 @@ public class Serial implements LiveData, SerialPortEventListener {
             while (rx.available() > 0)
                 data += (char) ((int) rx.read());
 
-            System.out.println("New Data");
-            System.out.print(data);
-
             subscribed.receiveData(parser.pushData(data));
         } catch (IOException e) {
             subscribed.receiveError("Cannot read from input stream.");

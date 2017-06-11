@@ -8,6 +8,7 @@ import java.util.Map;
 public class SixteenCarParser implements Parser {
     @Override
     public Map<String, Double> pushData(String data) {
+        System.out.print(data);
         return null;
     }
 }
