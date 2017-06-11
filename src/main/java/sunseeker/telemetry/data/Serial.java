@@ -3,7 +3,6 @@ package sunseeker.telemetry.data;
 import gnu.io.*;
 import sunseeker.telemetry.data.serial.IdentifierFactory;
 import sunseeker.telemetry.data.serial.configurator.Configurator;
-import sunseeker.telemetry.data.serial.configurator.Modem;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +32,8 @@ public class Serial implements LiveData, SerialPortEventListener {
 
     @Override
     public void start() throws CannotStartException {
-        bootstrap();
-
-        try {
-            configurator.configure(rx, tx);
-        } catch (Configurator.CannotConfigureException e) {
-            throw new CannotStartException("Cannot configure serial connection.");
-        }
+        establishSerialConnection();
+        configureSerialConnection();
     }
 
     @Override
@@ -57,7 +51,7 @@ public class Serial implements LiveData, SerialPortEventListener {
 
     }
 
-    private void bootstrap() throws CannotStartException {
+    private void establishSerialConnection() throws CannotStartException {
         if (subscribed == null) {
             throw new NoSubscriberException("You must subscribe before you start.");
         }
@@ -125,6 +119,14 @@ public class Serial implements LiveData, SerialPortEventListener {
             serialPort.notifyOnDataAvailable(true);
         } catch (TooManyListenersException e) {
             throw new CannotStartException("Cannot listen to serial port.");
+        }
+    }
+
+    private void configureSerialConnection() throws CannotStartException {
+        try {
+            configurator.configure(rx, tx);
+        } catch (Configurator.CannotConfigureException e) {
+            throw new CannotStartException("Cannot configure serial connection.");
         }
     }
 }

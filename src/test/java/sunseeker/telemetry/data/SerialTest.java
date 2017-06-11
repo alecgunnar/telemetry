@@ -43,6 +43,12 @@ public class SerialTest {
     @Mock
     private SerialPort mockSerialPort;
 
+    @Mock
+    private InputStream mockInputStream;
+
+    @Mock
+    private OutputStream mockOutputStream;
+
     private Serial subject;
 
     @Before
@@ -111,7 +117,7 @@ public class SerialTest {
 
 
     @Test
-    public void start_shouldOpenThePort_ifPortIsNotAlreadyInUse() throws PortInUseException, LiveData.CannotStartException {
+    public void start_shouldOpenThePort_ifPortIsNotAlreadyInUse() throws LiveData.CannotStartException, PortInUseException {
         setupValidScenario();
 
         subject.start();
@@ -120,7 +126,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldSetSerialPortParams() throws PortInUseException, LiveData.CannotStartException, UnsupportedCommOperationException {
+    public void start_shouldSetSerialPortParams() throws LiveData.CannotStartException, UnsupportedCommOperationException {
         setupValidScenario();
 
         subject.start();
@@ -129,7 +135,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldThrowCannotStartException_sayingCannotOpenInputStream_ifInputStreamCannotBeOpened() throws PortInUseException, IOException {
+    public void start_shouldThrowCannotStartException_sayingCannotOpenInputStream_ifInputStreamCannotBeOpened() throws IOException {
         setupValidScenario();
 
         when(mockSerialPort.getInputStream()).thenThrow(IOException.class);
@@ -138,7 +144,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldThrowCannotStartException_sayingCannotOpenOutputStream_ifOutputStreamCannotBeOpened() throws PortInUseException, IOException {
+    public void start_shouldThrowCannotStartException_sayingCannotOpenOutputStream_ifOutputStreamCannotBeOpened() throws IOException {
         setupValidScenario();
 
         when(mockSerialPort.getOutputStream()).thenThrow(IOException.class);
@@ -147,7 +153,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldThrowCannotStartException_sayingCannotListenToPort_ifTooManyListenersArePresent() throws PortInUseException, LiveData.CannotStartException, TooManyListenersException {
+    public void start_shouldThrowCannotStartException_sayingCannotListenToPort_ifTooManyListenersArePresent() throws LiveData.CannotStartException, TooManyListenersException {
         setupValidScenario();
 
         doThrow(TooManyListenersException.class).when(mockSerialPort).addEventListener(any(SerialPortEventListener.class));
@@ -156,7 +162,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldListenToSerialPort() throws PortInUseException, LiveData.CannotStartException, TooManyListenersException {
+    public void start_shouldListenToSerialPort() throws LiveData.CannotStartException, TooManyListenersException {
         setupValidScenario();
 
         subject.start();
@@ -166,7 +172,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldThrowCannotStartException_sayingCannotConfigure_ifConfiguratorThrowsException() throws PortInUseException, Configurator.CannotConfigureException {
+    public void start_shouldThrowCannotStartException_sayingCannotConfigure_ifConfiguratorThrowsException() throws Configurator.CannotConfigureException {
         setupValidScenario();
 
         doThrow(Configurator.CannotConfigureException.class).when(mockConfigurator).configure(any(InputStream.class), any(OutputStream.class));
@@ -174,10 +180,24 @@ public class SerialTest {
         assertCannotStart("Cannot configure serial connection.");
     }
 
-    private void setupValidScenario() throws PortInUseException {
-        when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
-        when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
-        when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mockSerialPort);
+    public void start_shouldConfigureTheSerialConnection() throws LiveData.CannotStartException, Configurator.CannotConfigureException {
+        setupValidScenario();
+
+        subject.start();
+
+        verify(mockConfigurator, times(1)).configure(mockInputStream, mockOutputStream);
+    }
+
+    private void setupValidScenario() {
+        try {
+            when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
+
+            when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
+            when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mockSerialPort);
+
+            when(mockSerialPort.getInputStream()).thenReturn(mockInputStream);
+            when(mockSerialPort.getOutputStream()).thenReturn(mockOutputStream);
+        } catch (Exception e) { }
     }
 
     private void assertCannotStart(String expectedMessage) {
