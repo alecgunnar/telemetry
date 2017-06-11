@@ -2,6 +2,8 @@ package sunseeker.telemetry.data;
 
 import gnu.io.*;
 import sunseeker.telemetry.data.serial.IdentifierFactory;
+import sunseeker.telemetry.data.serial.configurator.Configurator;
+import sunseeker.telemetry.data.serial.configurator.Modem;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ import java.util.TooManyListenersException;
 public class Serial implements LiveData, SerialPortEventListener {
     private String portName;
     private IdentifierFactory idFactory;
+    private Configurator configurator;
     private Subscriber subscribed;
 
     private CommPortIdentifier commPortId;
@@ -22,18 +25,21 @@ public class Serial implements LiveData, SerialPortEventListener {
     private InputStream rx;
     private OutputStream tx;
 
-    public Serial(String portName) {
-        this(portName, new IdentifierFactory());
-    }
-
-    public Serial(String portName, IdentifierFactory idFactory) {
+    public Serial(String portName, IdentifierFactory idFactory, Configurator configurator) {
         this.portName = portName;
         this.idFactory = idFactory;
+        this.configurator = configurator;
     }
 
     @Override
     public void start() throws CannotStartException {
         bootstrap();
+
+        try {
+            configurator.configure(rx, tx);
+        } catch (Configurator.CannotConfigureException e) {
+            throw new CannotStartException("Cannot configure serial connection.");
+        }
     }
 
     @Override

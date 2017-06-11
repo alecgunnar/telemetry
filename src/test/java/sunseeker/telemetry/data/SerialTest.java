@@ -7,8 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import sunseeker.telemetry.data.serial.IdentifierFactory;
+import sunseeker.telemetry.data.serial.configurator.Configurator;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
 import static org.hamcrest.core.Is.is;
@@ -32,6 +35,9 @@ public class SerialTest {
     private IdentifierFactory mockIdFactory;
 
     @Mock
+    private Configurator mockConfigurator;
+
+    @Mock
     private CommPortIdentifier mockIdentifier;
 
     @Mock
@@ -43,7 +49,7 @@ public class SerialTest {
     public void setup() {
         mockPortName = "/dev/sample_port";
 
-        subject = new Serial(mockPortName, mockIdFactory);
+        subject = new Serial(mockPortName, mockIdFactory, mockConfigurator);
 
             subject.subscribe(mockSubscriber);
     }
@@ -64,12 +70,7 @@ public class SerialTest {
     public void start_shouldEmitPortDoesNotExistError_ifNamedPortDoesNotExist() throws Exception {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(null);
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Serial port does not exist."));
-        }
+        assertCannotStart("Serial port does not exist.");
     }
 
     @Test
@@ -77,12 +78,7 @@ public class SerialTest {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(true);
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Serial port already in use."));
-        }
+        assertCannotStart("Serial port already in use.");
     }
 
     @Test
@@ -91,12 +87,7 @@ public class SerialTest {
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
         when(mockIdentifier.open(anyString(), anyInt())).thenThrow(PortInUseException.class);
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Serial port already in use."));
-        }
+        assertCannotStart("Serial port already in use.");
     }
 
     @Test
@@ -105,12 +96,7 @@ public class SerialTest {
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
         when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mock(NotASerialPort.class));
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Given port is not a serial port."));
-        }
+        assertCannotStart("Given port is not a serial port.");
     }
 
     @Test
@@ -120,12 +106,7 @@ public class SerialTest {
         when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mockSerialPort);
         doThrow(UnsupportedCommOperationException.class).when(mockSerialPort).setSerialPortParams(anyInt(), anyInt(), anyInt(), anyInt());
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Serial port operation not supported."));
-        }
+        assertCannotStart("Serial port operation not supported.");
     }
 
 
@@ -153,12 +134,7 @@ public class SerialTest {
 
         when(mockSerialPort.getInputStream()).thenThrow(IOException.class);
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Cannot open input stream."));
-        }
+        assertCannotStart("Cannot open input stream.");
     }
 
     @Test
@@ -167,12 +143,7 @@ public class SerialTest {
 
         when(mockSerialPort.getOutputStream()).thenThrow(IOException.class);
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Cannot open output stream."));
-        }
+        assertCannotStart("Cannot open output stream.");
     }
 
     @Test
@@ -181,12 +152,7 @@ public class SerialTest {
 
         doThrow(TooManyListenersException.class).when(mockSerialPort).addEventListener(any(SerialPortEventListener.class));
 
-        try {
-            subject.start();
-            fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
-            assertThat(e.getMessage(), is("Cannot listen to serial port."));
-        }
+        assertCannotStart("Cannot listen to serial port.");
     }
 
     @Test
@@ -199,10 +165,28 @@ public class SerialTest {
         verify(mockSerialPort, times(1)).notifyOnDataAvailable(true);
     }
 
+    @Test
+    public void start_shouldThrowCannotStartException_sayingCannotConfigure_ifConfiguratorThrowsException() throws PortInUseException, Configurator.CannotConfigureException {
+        setupValidScenario();
+
+        doThrow(Configurator.CannotConfigureException.class).when(mockConfigurator).configure(any(InputStream.class), any(OutputStream.class));
+
+        assertCannotStart("Cannot configure serial connection.");
+    }
+
     private void setupValidScenario() throws PortInUseException {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
         when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mockSerialPort);
+    }
+
+    private void assertCannotStart(String expectedMessage) {
+        try {
+            subject.start();
+            fail("Expected cannot start exception");
+        } catch (LiveData.CannotStartException e) {
+            assertThat(e.getMessage(), is(expectedMessage));
+        }
     }
 
     private abstract class NotASerialPort extends CommPort { }
