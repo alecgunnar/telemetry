@@ -6,7 +6,7 @@ import java.io.OutputStream;
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public class Modem implements Configurator {
+public class ModemConfigurator implements Configurator {
     @Override
     public void configure(InputStream rx, OutputStream tx) throws CannotConfigureException {
 
