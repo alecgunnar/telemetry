@@ -122,7 +122,7 @@ public class SerialTest {
 
         subject.start();
 
-        verify(mockIdentifier, times(1)).   open(anyString(), eq(3000));
+        verify(mockIdentifier, times(1)).       open(anyString(), eq(3000));
     }
 
     @Test
