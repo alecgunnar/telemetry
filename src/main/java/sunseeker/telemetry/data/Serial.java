@@ -1,12 +1,16 @@
 package sunseeker.telemetry.data;
 
 import gnu.io.*;
+import sunseeker.telemetry.data.parser.Parser;
 import sunseeker.telemetry.data.serial.IdentifierFactory;
 import sunseeker.telemetry.data.serial.configurator.Configurator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.TooManyListenersException;
 
 /**
@@ -16,6 +20,8 @@ public class Serial implements LiveData, SerialPortEventListener {
     private String portName;
     private IdentifierFactory idFactory;
     private Configurator configurator;
+    private Parser parser;
+
     private Subscriber subscribed;
 
     private CommPortIdentifier commPortId;
@@ -24,10 +30,11 @@ public class Serial implements LiveData, SerialPortEventListener {
     private InputStream rx;
     private OutputStream tx;
 
-    public Serial(String portName, IdentifierFactory idFactory, Configurator configurator) {
+    public Serial(String portName, IdentifierFactory idFactory, Configurator configurator, Parser parser) {
         this.portName = portName;
         this.idFactory = idFactory;
         this.configurator = configurator;
+        this.parser = parser;
     }
 
     @Override
@@ -48,7 +55,19 @@ public class Serial implements LiveData, SerialPortEventListener {
 
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
+        try {
+            int readIn;
+            int count = 0;
+            byte[] data = new byte[512];
 
+            while ((readIn = rx.read()) > -1)
+                data[count++] = (byte) readIn;
+
+            Map<String, Double> parsed = parser.pushData(new String(data, 0, count));
+            subscribed.receiveData(parsed);
+        } catch (IOException e) {
+            subscribed.receiveError("Cannot read from input stream.");
+        }
     }
 
     private void establishSerialConnection() throws CannotStartException {

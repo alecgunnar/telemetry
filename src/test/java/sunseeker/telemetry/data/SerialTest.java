@@ -6,12 +6,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import sunseeker.telemetry.data.parser.Parser;
 import sunseeker.telemetry.data.serial.IdentifierFactory;
 import sunseeker.telemetry.data.serial.configurator.Configurator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.TooManyListenersException;
 
 import static org.hamcrest.core.Is.is;
@@ -38,6 +40,9 @@ public class SerialTest {
     private Configurator mockConfigurator;
 
     @Mock
+    private Parser mockParser;
+
+    @Mock
     private CommPortIdentifier mockIdentifier;
 
     @Mock
@@ -49,15 +54,18 @@ public class SerialTest {
     @Mock
     private OutputStream mockOutputStream;
 
+    @Mock
+    private SerialPortEvent mockSerialPortEvent;
+
     private Serial subject;
 
     @Before
     public void setup() {
         mockPortName = "/dev/sample_port";
 
-        subject = new Serial(mockPortName, mockIdFactory, mockConfigurator);
+        subject = new Serial(mockPortName, mockIdFactory, mockConfigurator, mockParser);
 
-            subject.subscribe(mockSubscriber);
+        subject.subscribe(mockSubscriber);
     }
 
     @Test
@@ -180,12 +188,52 @@ public class SerialTest {
         assertCannotStart("Cannot configure serial connection.");
     }
 
+    @Test
     public void start_shouldConfigureTheSerialConnection() throws LiveData.CannotStartException, Configurator.CannotConfigureException {
         setupValidScenario();
 
         subject.start();
 
         verify(mockConfigurator, times(1)).configure(mockInputStream, mockOutputStream);
+    }
+
+    @Test
+    public void serialEvent_shouldEmitError_ifInputStreamCannotBeReadFrom() throws IOException, LiveData.CannotStartException {
+        setupStartedScenario();
+
+        when(mockInputStream.read()).thenThrow(IOException.class);
+
+        subject.serialEvent(mockSerialPortEvent);
+
+        verify(mockSubscriber, times(1)).receiveError("Cannot read from input stream.");
+    }
+
+    @Test
+    public void serialEvent_shouldReadAllData_thenSendItToTheParser() throws IOException {
+        setupStartedScenario();
+
+        byte[] data = {1, 2, 3};
+
+        when(mockInputStream.read()).thenReturn(1, 2, 3, -1);
+
+        subject.serialEvent(mockSerialPortEvent);
+
+        verify(mockInputStream, times(4)).read();
+        verify(mockParser, times(1)).pushData(new String(data));
+    }
+
+    @Test
+    public void serialEvent_shouldEmitDataFromParser() throws IOException {
+        setupStartedScenario();
+
+        Map<String, Double> mockData = mock(Map.class);
+
+        when(mockParser.pushData(any())).thenReturn(mockData);
+        when(mockInputStream.read()).thenReturn(-1);
+
+        subject.serialEvent(mockSerialPortEvent);
+
+        verify(mockSubscriber, times(1)).receiveData(mockData);
     }
 
     private void setupValidScenario() {
@@ -198,6 +246,14 @@ public class SerialTest {
             when(mockSerialPort.getInputStream()).thenReturn(mockInputStream);
             when(mockSerialPort.getOutputStream()).thenReturn(mockOutputStream);
         } catch (Exception e) { }
+    }
+
+    private void setupStartedScenario() {
+        setupValidScenario();
+
+        try {
+            subject.start();
+        } catch (LiveData.CannotStartException e) { }
     }
 
     private void assertCannotStart(String expectedMessage) {
