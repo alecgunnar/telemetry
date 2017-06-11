@@ -6,11 +6,12 @@ import sunseeker.telemetry.data.serial.IdentifierFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.TooManyListenersException;
 
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public class Serial implements LiveData {
+public class Serial implements LiveData, SerialPortEventListener {
     private String portName;
     private IdentifierFactory idFactory;
     private Subscriber subscribed;
@@ -31,7 +32,7 @@ public class Serial implements LiveData {
     }
 
     @Override
-    public void start() throws CannotStartException  {
+    public void start() throws CannotStartException {
         bootstrap();
     }
 
@@ -45,20 +46,25 @@ public class Serial implements LiveData {
         subscribed = sub;
     }
 
+    @Override
+    public void serialEvent(SerialPortEvent serialPortEvent) {
+
+    }
+
     private void bootstrap() throws CannotStartException {
         if (subscribed == null) {
             throw new NoSubscriberException("You must subscribe before you start.");
         }
 
-        commPortId = idFactory.createIdentifier(portName);
+        getSerialPort();
 
-        if (commPortId == null) {
-            throw new CannotStartException("Serial port does not exist.");
-        }
+        openRxTxStreams();
 
-        if (commPortId.isCurrentlyOwned()) {
-            throw new CannotStartException("Serial port already in use.");
-        }
+        listenToSerialPort();
+    }
+
+    private void getSerialPort() throws CannotStartException {
+        getCommPortId();
 
         CommPort commPort;
 
@@ -79,8 +85,18 @@ public class Serial implements LiveData {
         } catch (UnsupportedCommOperationException e) {
             throw new CannotStartException("Serial port operation not supported.");
         }
+    }
 
-        openRxTxStreams();
+    private void getCommPortId() throws CannotStartException {
+        commPortId = idFactory.createIdentifier(portName);
+
+        if (commPortId == null) {
+            throw new CannotStartException("Serial port does not exist.");
+        }
+
+        if (commPortId.isCurrentlyOwned()) {
+            throw new CannotStartException("Serial port already in use.");
+        }
     }
 
     private void openRxTxStreams() throws CannotStartException {
@@ -94,6 +110,15 @@ public class Serial implements LiveData {
             tx = serialPort.getOutputStream();
         } catch (IOException e) {
             throw new CannotStartException("Cannot open output stream.");
+        }
+    }
+
+    private void listenToSerialPort() throws CannotStartException {
+        try {
+            serialPort.addEventListener(this);
+            serialPort.notifyOnDataAvailable(true);
+        } catch (TooManyListenersException e) {
+            throw new CannotStartException("Cannot listen to serial port.");
         }
     }
 }

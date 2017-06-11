@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import sunseeker.telemetry.data.serial.IdentifierFactory;
 
 import java.io.IOException;
+import java.util.TooManyListenersException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -44,7 +45,7 @@ public class SerialTest {
 
         subject = new Serial(mockPortName, mockIdFactory);
 
-        subject.subscribe(mockSubscriber);
+            subject.subscribe(mockSubscriber);
     }
 
     @Test
@@ -172,6 +173,30 @@ public class SerialTest {
         } catch (LiveData.CannotStartException e) {
             assertThat(e.getMessage(), is("Cannot open output stream."));
         }
+    }
+
+    @Test
+    public void start_shouldThrowCannotStartException_sayingCannotListenToPort_ifTooManyListenersArePresent() throws PortInUseException, LiveData.CannotStartException, TooManyListenersException {
+        setupValidScenario();
+
+        doThrow(TooManyListenersException.class).when(mockSerialPort).addEventListener(any(SerialPortEventListener.class));
+
+        try {
+            subject.start();
+            fail("Expected cannot start exception");
+        } catch (LiveData.CannotStartException e) {
+            assertThat(e.getMessage(), is("Cannot listen to serial port."));
+        }
+    }
+
+    @Test
+    public void start_shouldListenToSerialPort() throws PortInUseException, LiveData.CannotStartException, TooManyListenersException {
+        setupValidScenario();
+
+        subject.start();
+
+        verify(mockSerialPort, times(1)).addEventListener(subject);
+        verify(mockSerialPort, times(1)).notifyOnDataAvailable(true);
     }
 
     private void setupValidScenario() throws PortInUseException {
