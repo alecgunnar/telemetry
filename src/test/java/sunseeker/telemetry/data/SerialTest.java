@@ -201,6 +201,7 @@ public class SerialTest {
     public void serialEvent_shouldEmitError_ifInputStreamCannotBeReadFrom() throws IOException, LiveData.CannotStartException {
         setupStartedScenario();
 
+        when(mockInputStream.available()).thenReturn(1);
         when(mockInputStream.read()).thenThrow(IOException.class);
 
         subject.serialEvent(mockSerialPortEvent);
@@ -214,11 +215,12 @@ public class SerialTest {
 
         byte[] data = {1, 2, 3};
 
+        when(mockInputStream.available()).thenReturn(3, 2, 1, 0);
         when(mockInputStream.read()).thenReturn(1, 2, 3, -1);
 
         subject.serialEvent(mockSerialPortEvent);
 
-        verify(mockInputStream, times(4)).read();
+        verify(mockInputStream, times(3)).read();
         verify(mockParser, times(1)).pushData(new String(data));
     }
 
@@ -229,7 +231,7 @@ public class SerialTest {
         Map<String, Double> mockData = mock(Map.class);
 
         when(mockParser.pushData(any())).thenReturn(mockData);
-        when(mockInputStream.read()).thenReturn(-1);
+        when(mockInputStream.available()).thenReturn(0);
 
         subject.serialEvent(mockSerialPortEvent);
 

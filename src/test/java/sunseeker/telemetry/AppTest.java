@@ -20,12 +20,12 @@ public class AppTest {
 
     @Test
     public void should_createALiveDataFrame() {
-        assertThat(subject.getLiveDataFrame(), not(nullValue()));
+        assertThat(subject.getLiveDataFrameFrame(), not(nullValue()));
     }
 
     @Test
     public void should_runMakesTheLiveDataFrameVisible() {
         subject.run();
-        assertTrue(subject.getLiveDataFrame().isVisible());
+        assertTrue(subject.getLiveDataFrameFrame().isVisible());
     }
 }

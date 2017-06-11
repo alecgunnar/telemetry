@@ -8,8 +8,6 @@ import sunseeker.telemetry.data.serial.configurator.Configurator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TooManyListenersException;
 
@@ -56,15 +54,15 @@ public class Serial implements LiveData, SerialPortEventListener {
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
         try {
-            int readIn;
-            int count = 0;
-            byte[] data = new byte[512];
+            String data = "";
 
-            while ((readIn = rx.read()) > -1)
-                data[count++] = (byte) readIn;
+            while (rx.available() > 0)
+                data += (char) ((int) rx.read());
 
-            Map<String, Double> parsed = parser.pushData(new String(data, 0, count));
-            subscribed.receiveData(parsed);
+            System.out.println("New Data");
+            System.out.print(data);
+
+            subscribed.receiveData(parser.pushData(data));
         } catch (IOException e) {
             subscribed.receiveError("Cannot read from input stream.");
         }

@@ -2,6 +2,7 @@ package sunseeker.telemetry.ui;
 
 import org.junit.Before;
 import org.junit.Test;
+import sunseeker.telemetry.ui.frame.LiveDataFrame;
 
 import javax.swing.*;
 
@@ -12,12 +13,12 @@ import static org.junit.Assert.*;
 /**
  * Created by aleccarpenter on 6/10/17.
  */
-public class LiveDataTest {
-    private LiveData subject;
+public class LiveDataFrameTest {
+    private LiveDataFrame subject;
 
     @Before
     public void setup() {
-        subject = new LiveData();
+        subject = new LiveDataFrame();
     }
 
     @Test
