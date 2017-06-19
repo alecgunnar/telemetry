@@ -27,11 +27,11 @@ import static org.mockito.Mockito.*;
  * Created by aleccarpenter on 6/11/17.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SerialTest {
+public class SerialDataSourceTest {
     private String mockPortName;
 
     @Mock
-    private LiveData.Subscriber mockSubscriber;
+    private LiveDataSource.Subscriber mockSubscriber;
 
     @Mock
     private IdentifierFactory mockIdFactory;
@@ -57,13 +57,13 @@ public class SerialTest {
     @Mock
     private SerialPortEvent mockSerialPortEvent;
 
-    private Serial subject;
+    private SerialDataSource subject;
 
     @Before
     public void setup() {
         mockPortName = "/dev/sample_port";
 
-        subject = new Serial(mockPortName, mockIdFactory, mockConfigurator, mockParser);
+        subject = new SerialDataSource(mockPortName, mockIdFactory, mockConfigurator, mockParser);
 
         subject.subscribe(mockSubscriber);
     }
@@ -84,7 +84,7 @@ public class SerialTest {
     public void start_shouldEmitPortDoesNotExistError_ifNamedPortDoesNotExist() throws Exception {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(null);
 
-        assertCannotStart("Serial port does not exist.");
+        assertCannotStart("SerialDataSource port does not exist.");
     }
 
     @Test
@@ -92,20 +92,20 @@ public class SerialTest {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(true);
 
-        assertCannotStart("Serial port already in use.");
+        assertCannotStart("SerialDataSource port already in use.");
     }
 
     @Test
-    public void start_shouldEmitPortAlreadyInUse_ifPortIsAlreadyInUse() throws PortInUseException, LiveData.NoSubscriberException {
+    public void start_shouldEmitPortAlreadyInUse_ifPortIsAlreadyInUse() throws PortInUseException, LiveDataSource.NoSubscriberException {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
         when(mockIdentifier.open(anyString(), anyInt())).thenThrow(PortInUseException.class);
 
-        assertCannotStart("Serial port already in use.");
+        assertCannotStart("SerialDataSource port already in use.");
     }
 
     @Test
-    public void start_shouldThrowCannotStartException_sayingNotASerialPort_ifPortIsNotASerialPort() throws PortInUseException, LiveData.NoSubscriberException {
+    public void start_shouldThrowCannotStartException_sayingNotASerialPort_ifPortIsNotASerialPort() throws PortInUseException, LiveDataSource.NoSubscriberException {
         when(mockIdFactory.createIdentifier(mockPortName)).thenReturn(mockIdentifier);
         when(mockIdentifier.isCurrentlyOwned()).thenReturn(false);
         when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mock(NotASerialPort.class));
@@ -120,12 +120,12 @@ public class SerialTest {
         when(mockIdentifier.open(anyString(), anyInt())).thenReturn(mockSerialPort);
         doThrow(UnsupportedCommOperationException.class).when(mockSerialPort).setSerialPortParams(anyInt(), anyInt(), anyInt(), anyInt());
 
-        assertCannotStart("Serial port operation not supported.");
+        assertCannotStart("SerialDataSource port operation not supported.");
     }
 
 
     @Test
-    public void start_shouldOpenThePort_ifPortIsNotAlreadyInUse() throws LiveData.CannotStartException, PortInUseException {
+    public void start_shouldOpenThePort_ifPortIsNotAlreadyInUse() throws LiveDataSource.CannotStartException, PortInUseException {
         setupValidScenario();
 
         subject.start();
@@ -134,7 +134,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldSetSerialPortParams() throws LiveData.CannotStartException, UnsupportedCommOperationException {
+    public void start_shouldSetSerialPortParams() throws LiveDataSource.CannotStartException, UnsupportedCommOperationException {
         setupValidScenario();
 
         subject.start();
@@ -161,7 +161,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldThrowCannotStartException_sayingCannotListenToPort_ifTooManyListenersArePresent() throws LiveData.CannotStartException, TooManyListenersException {
+    public void start_shouldThrowCannotStartException_sayingCannotListenToPort_ifTooManyListenersArePresent() throws LiveDataSource.CannotStartException, TooManyListenersException {
         setupValidScenario();
 
         doThrow(TooManyListenersException.class).when(mockSerialPort).addEventListener(any(SerialPortEventListener.class));
@@ -170,7 +170,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldListenToSerialPort() throws LiveData.CannotStartException, TooManyListenersException {
+    public void start_shouldListenToSerialPort() throws LiveDataSource.CannotStartException, TooManyListenersException {
         setupValidScenario();
 
         subject.start();
@@ -189,7 +189,7 @@ public class SerialTest {
     }
 
     @Test
-    public void start_shouldConfigureTheSerialConnection() throws LiveData.CannotStartException, Configurator.CannotConfigureException {
+    public void start_shouldConfigureTheSerialConnection() throws LiveDataSource.CannotStartException, Configurator.CannotConfigureException {
         setupValidScenario();
 
         subject.start();
@@ -198,7 +198,7 @@ public class SerialTest {
     }
 
     @Test
-    public void serialEvent_shouldEmitError_ifInputStreamCannotBeReadFrom() throws IOException, LiveData.CannotStartException {
+    public void serialEvent_shouldEmitError_ifInputStreamCannotBeReadFrom() throws IOException, LiveDataSource.CannotStartException {
         setupStartedScenario();
 
         when(mockInputStream.available()).thenReturn(1);
@@ -255,14 +255,14 @@ public class SerialTest {
 
         try {
             subject.start();
-        } catch (LiveData.CannotStartException e) { }
+        } catch (LiveDataSource.CannotStartException e) { }
     }
 
     private void assertCannotStart(String expectedMessage) {
         try {
             subject.start();
             fail("Expected cannot start exception");
-        } catch (LiveData.CannotStartException e) {
+        } catch (LiveDataSource.CannotStartException e) {
             assertThat(e.getMessage(), is(expectedMessage));
         }
     }

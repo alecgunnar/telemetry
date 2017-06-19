@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public interface LiveData {
+public interface LiveDataSource {
     void start() throws CannotStartException;
 
     void stop();

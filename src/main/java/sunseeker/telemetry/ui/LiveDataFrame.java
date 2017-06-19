@@ -10,11 +10,11 @@ import java.awt.*;
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public class LiveData extends JFrame {
+public class LiveDataFrame extends JFrame {
     private JPanel mainPanel;
     private JPanel graphPanel;
 
-    public LiveData(XChartPanel chartPanel) {
+    public LiveDataFrame(XChartPanel chartPanel) {
         super("Sunseeker Telemetry");
 
         setPreferredSize(new Dimension(960, 720));

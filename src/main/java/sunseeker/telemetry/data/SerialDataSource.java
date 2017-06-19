@@ -8,13 +8,12 @@ import sunseeker.telemetry.data.serial.configurator.Configurator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.TooManyListenersException;
 
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public class Serial implements LiveData, SerialPortEventListener {
+public class SerialDataSource implements LiveDataSource, SerialPortEventListener {
     private String portName;
     private IdentifierFactory idFactory;
     private Configurator configurator;
@@ -28,7 +27,7 @@ public class Serial implements LiveData, SerialPortEventListener {
     private InputStream rx;
     private OutputStream tx;
 
-    public Serial(String portName, IdentifierFactory idFactory, Configurator configurator, Parser parser) {
+    public SerialDataSource(String portName, IdentifierFactory idFactory, Configurator configurator, Parser parser) {
         this.portName = portName;
         this.idFactory = idFactory;
         this.configurator = configurator;
@@ -85,7 +84,7 @@ public class Serial implements LiveData, SerialPortEventListener {
         try {
             commPort = commPortId.open(this.getClass().getName(), 3000);
         } catch (PortInUseException e) {
-            throw new CannotStartException("Serial port already in use.");
+            throw new CannotStartException("SerialDataSource port already in use.");
         }
 
         if (!(commPort instanceof SerialPort)) {
@@ -97,7 +96,7 @@ public class Serial implements LiveData, SerialPortEventListener {
         try {
             serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_2, SerialPort.PARITY_NONE);
         } catch (UnsupportedCommOperationException e) {
-            throw new CannotStartException("Serial port operation not supported.");
+            throw new CannotStartException("SerialDataSource port operation not supported.");
         }
     }
 
@@ -105,11 +104,11 @@ public class Serial implements LiveData, SerialPortEventListener {
         commPortId = idFactory.createIdentifier(portName);
 
         if (commPortId == null) {
-            throw new CannotStartException("Serial port does not exist.");
+            throw new CannotStartException("SerialDataSource port does not exist.");
         }
 
         if (commPortId.isCurrentlyOwned()) {
-            throw new CannotStartException("Serial port already in use.");
+            throw new CannotStartException("SerialDataSource port already in use.");
         }
     }
 

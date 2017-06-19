@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.swing.*;
@@ -18,8 +17,8 @@ import static org.junit.Assert.*;
  * Created by aleccarpenter on 6/10/17.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class LiveDataTest {
-    private LiveData subject;
+public class LiveDataSourceTest {
+    private LiveDataFrame subject;
 
     private XChartPanel mockChartPanel;
 
@@ -27,7 +26,7 @@ public class LiveDataTest {
     public void setup() {
         mockChartPanel = new XChartPanel(new XYChart(10, 20));
 
-        subject = new LiveData(mockChartPanel);
+        subject = new LiveDataFrame(mockChartPanel);
     }
 
     @Test

@@ -5,11 +5,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import sunseeker.telemetry.ui.LiveData;
+import sunseeker.telemetry.ui.LiveDataFrame;
 
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -21,17 +20,17 @@ public class AppTest {
     private App subject;
 
     @Mock
-    private LiveData mockLiveDataFrame;
+    private LiveDataFrame mockLiveDataFrameFrame;
 
     @Before
     public void setup() {
-        subject = new App(mockLiveDataFrame);
+        subject = new App(mockLiveDataFrameFrame);
     }
 
     @Test
     public void should_runMakesTheLiveDataFrameVisible() {
         subject.run();
 
-        verify(mockLiveDataFrame, times(1)).setVisible(true);
+        verify(mockLiveDataFrameFrame, times(1)).setVisible(true);
     }
 }
