@@ -25,13 +25,17 @@ public class PseudoRandomDataSource implements LiveDataSource {
         while (true) {
             Map<String, Double> data = new HashMap<>();
 
-            data.put("hello", Math.floor(100 * generator.nextDouble()));
-            data.put("goodbye", Math.floor(100 * generator.nextDouble()));
+            data.put("venus", Math.floor(100 * generator.nextDouble()));
+            data.put("mercury", Math.floor(100 * generator.nextDouble()));
+            data.put("mars", Math.floor(100 * generator.nextDouble()));
+            data.put("earth", Math.floor(100 * generator.nextDouble()));
+            data.put("jupiter", Math.floor(100 * generator.nextDouble()));
+            data.put("saturn", Math.floor(100 * generator.nextDouble()));
 
             subscriber.receiveData(data);
 
             try {
-                Thread.sleep(250);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 break;
             }

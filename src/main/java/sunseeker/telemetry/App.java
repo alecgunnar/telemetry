@@ -37,11 +37,11 @@ public class App {
 
         Thread dataThread = new Thread() {
             public void run() {
-                try {
-                    liveDataSourceSource.start();
-                } catch (LiveDataSource.CannotStartException e) {
-                    e.printStackTrace();
-                }
+            try {
+                liveDataSourceSource.start();
+            } catch (LiveDataSource.CannotStartException e) {
+                e.printStackTrace();
+            }
             }
         };
 

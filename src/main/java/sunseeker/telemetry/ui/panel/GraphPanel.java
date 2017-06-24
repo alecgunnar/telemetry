@@ -15,49 +15,65 @@ public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber
 
     private final int MAX_DATA_POINTS;
 
-    private double counter = 1.0;
-
+    private Map<String, Double> current = new HashMap<>();
     private Map<String, List<Double>> data = new HashMap<>();
-    private List<Double> times = new ArrayList<>();
+    private final List<Double> filler = new ArrayList<>();
 
     public GraphPanel(XYChart chart, int maxDataPoints) {
         super(chart);
 
         this.chart = chart;
         MAX_DATA_POINTS = maxDataPoints;
+
+        for (int i = 0; i < maxDataPoints; i++) {
+            filler.add(i + 1.0);
+        }
+
+        Thread updateChart = new Thread() {
+            public void run() {
+                while (true) {
+                    for (String key : data.keySet()) {
+                        List<Double> values = data.get(key);
+
+                        values.remove(0);
+                        values.add(current.get(key));
+
+                        chart.updateXYSeries(key, filler, values, null);
+                    }
+
+                    SwingUtilities.invokeLater(() -> {
+                        revalidate();
+                        repaint();
+                    });
+
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        };
+
+        updateChart.start();
     }
 
     @Override
     public void receiveData(Map<String, Double> values) {
-        times.add(counter++);
-
-        if (times.size() > MAX_DATA_POINTS) {
-            times.remove(0);
-        }
-
         for (String key : values.keySet()) {
             if (!data.containsKey(key)) {
-                data.put(key, new ArrayList<>());
+                List<Double> newDataList = new ArrayList<>();
+                newDataList.addAll(filler);
+
+                data.put(key, newDataList);
             }
 
-            List<Double> data = this.data.get(key);
-            data.add(values.get(key));
-
-            if (data.size() > MAX_DATA_POINTS) {
-                data.remove(0);
-            }
+            current.put(key, values.get(key));
 
             try {
-                chart.updateXYSeries(key, times, data, null);
-            } catch (IllegalArgumentException e) {
-                chart.addSeries(key, times, data);
-            }
+                chart.addSeries(key, filler, data.get(key));
+            } catch (IllegalArgumentException e) { }
         }
-
-        SwingUtilities.invokeLater(() -> {
-            revalidate();
-            repaint();
-        });
     }
 
     @Override
