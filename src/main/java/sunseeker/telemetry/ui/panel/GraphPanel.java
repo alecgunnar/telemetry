@@ -3,6 +3,7 @@ package sunseeker.telemetry.ui.panel;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import sunseeker.telemetry.data.LiveDataSource;
+import sunseeker.telemetry.ui.table.SummaryTable;
 
 import javax.swing.*;
 import java.util.*;
@@ -10,7 +11,7 @@ import java.util.*;
 /**
  * Created by aleccarpenter on 6/18/17.
  */
-public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber {
+public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber, SummaryTable.Configurable {
     private XYChart chart;
 
     private final int MAX_DATA_POINTS;
@@ -31,27 +32,27 @@ public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber
 
         Thread updateChart = new Thread() {
             public void run() {
-                while (true) {
-                    for (String key : data.keySet()) {
-                        List<Double> values = data.get(key);
+            while (true) {
+                for (String key : data.keySet()) {
+                    List<Double> values = data.get(key);
 
-                        values.remove(0);
-                        values.add(current.get(key));
+                    values.remove(0);
+                    values.add(current.get(key));
 
-                        chart.updateXYSeries(key, filler, values, null);
-                    }
-
-                    SwingUtilities.invokeLater(() -> {
-                        revalidate();
-                        repaint();
-                    });
-
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
+                    chart.updateXYSeries(key, filler, values, null);
                 }
+
+                SwingUtilities.invokeLater(() -> {
+                    revalidate();
+                    repaint();
+                });
+
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
             }
         };
 
@@ -79,5 +80,10 @@ public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber
     @Override
     public void receiveError(String msg) {
         // Not doing anything with this right now...
+    }
+
+    @Override
+    public void toggleField(String name) {
+
     }
 }

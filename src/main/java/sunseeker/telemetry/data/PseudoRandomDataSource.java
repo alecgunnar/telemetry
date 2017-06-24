@@ -9,10 +9,8 @@ import java.util.Random;
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public class PseudoRandomDataSource implements LiveDataSource {
+public class PseudoRandomDataSource extends AbstractDataSource implements LiveDataSource {
     private Parser parser;
-
-    private Subscriber subscriber;
 
     public PseudoRandomDataSource(Parser parser) {
         this.parser = parser;
@@ -32,7 +30,7 @@ public class PseudoRandomDataSource implements LiveDataSource {
             data.put("jupiter", Math.floor(100 * generator.nextDouble()));
             data.put("saturn", Math.floor(100 * generator.nextDouble()));
 
-            subscriber.receiveData(data);
+            emitData(data);
 
             try {
                 Thread.sleep(1000);
@@ -45,10 +43,5 @@ public class PseudoRandomDataSource implements LiveDataSource {
     @Override
     public void stop() {
 
-    }
-
-    @Override
-    public void subscribe(Subscriber sub) {
-        subscriber = sub;
     }
 }

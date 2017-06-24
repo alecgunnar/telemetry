@@ -13,7 +13,7 @@ import java.util.TooManyListenersException;
 /**
  * Created by aleccarpenter on 6/11/17.
  */
-public class SerialDataSource implements LiveDataSource, SerialPortEventListener {
+public class SerialDataSource extends AbstractDataSource implements SerialPortEventListener {
     private String portName;
     private IdentifierFactory idFactory;
     private Configurator configurator;
@@ -46,11 +46,6 @@ public class SerialDataSource implements LiveDataSource, SerialPortEventListener
     }
 
     @Override
-    public void subscribe(Subscriber sub) {
-        subscribed = sub;
-    }
-
-    @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
         try {
             String data = "";
@@ -58,7 +53,7 @@ public class SerialDataSource implements LiveDataSource, SerialPortEventListener
             while (rx.available() > 0)
                 data += (char) ((int) rx.read());
 
-            subscribed.receiveData(parser.pushData(data));
+            emitData(parser.pushData(data));
         } catch (IOException e) {
             subscribed.receiveError("Cannot read from input stream.");
         }

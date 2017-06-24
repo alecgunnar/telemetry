@@ -5,10 +5,10 @@ import org.knowm.xchart.XYChartBuilder;
 import sunseeker.telemetry.data.LiveDataSource;
 import sunseeker.telemetry.data.PseudoRandomDataSource;
 import sunseeker.telemetry.data.parser.Parser;
-import sunseeker.telemetry.data.parser.SixteenCarParser;
+import sunseeker.telemetry.data.parser.GenericParser;
 import sunseeker.telemetry.ui.LiveDataFrame;
 import sunseeker.telemetry.ui.panel.GraphPanel;
-import sunseeker.telemetry.ui.table.ConfigTable;
+import sunseeker.telemetry.ui.table.SummaryTable;
 
 import javax.swing.SwingUtilities;
 
@@ -27,13 +27,16 @@ public class App {
 
         chart.getStyler().setXAxisTicksVisible(false);
 
-        GraphPanel chartPanel = new GraphPanel(chart, MAX_DATA_POINTS);
-        ConfigTable configTable = new ConfigTable();
-        LiveDataFrame liveDataFrameFrame = new LiveDataFrame(chartPanel, configTable);
+        GraphPanel graphPanel = new GraphPanel(chart, MAX_DATA_POINTS);
+        SummaryTable summaryTable = new SummaryTable();
+        LiveDataFrame liveDataFrameFrame = new LiveDataFrame(graphPanel, summaryTable);
 
-        Parser parser = new SixteenCarParser();
+        summaryTable.configure(graphPanel);
+
+        Parser parser = new GenericParser();
         LiveDataSource liveDataSourceSource = new PseudoRandomDataSource(parser);
-        liveDataSourceSource.subscribe(chartPanel);
+        liveDataSourceSource.subscribe(graphPanel);
+        liveDataSourceSource.subscribe(summaryTable);
 
         Thread dataThread = new Thread() {
             public void run() {

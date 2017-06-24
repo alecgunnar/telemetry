@@ -5,9 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import sunseeker.telemetry.ui.table.ConfigTable;
+import sunseeker.telemetry.ui.table.SummaryTable;
 
 import javax.swing.*;
 
@@ -27,14 +26,14 @@ public class LiveDataFrameTest {
 
     private XChartPanel mockChartPanel;
 
-    private ConfigTable mockConfigTable;
+    private SummaryTable mockSummaryTable;
 
     @Before
     public void setup() {
         mockChartPanel = new XChartPanel(new XYChart(10, 20));
-        mockConfigTable = new ConfigTable();
+        mockSummaryTable = new SummaryTable();
 
-        subject = new LiveDataFrame(mockChartPanel, mockConfigTable);
+        subject = new LiveDataFrame(mockChartPanel, mockSummaryTable);
     }
 
     @Test
@@ -85,6 +84,6 @@ public class LiveDataFrameTest {
         JViewport viewPort = (JViewport) scrollPane.getComponent(0);
         Component expectedConfigTable = viewPort.getComponent(0);
 
-        assertThat(expectedConfigTable, is(mockConfigTable));
+        assertThat(expectedConfigTable, is(mockSummaryTable));
     }
 }

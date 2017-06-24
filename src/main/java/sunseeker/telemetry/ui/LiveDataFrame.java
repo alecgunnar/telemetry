@@ -3,7 +3,7 @@ package sunseeker.telemetry.ui;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.knowm.xchart.XChartPanel;
-import sunseeker.telemetry.ui.table.ConfigTable;
+import sunseeker.telemetry.ui.table.SummaryTable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,16 +16,20 @@ public class LiveDataFrame extends JFrame {
     private JPanel graphPanel;
     private JPanel configPanel;
 
-    public LiveDataFrame(XChartPanel chartPanel, ConfigTable configTable) {
+    public LiveDataFrame(XChartPanel chartPanel, SummaryTable summaryTable) {
         super("Sunseeker Telemetry");
 
         setPreferredSize(new Dimension(960, 720));
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        JScrollPane scrollPane = new JScrollPane(summaryTable);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // TODO: test for this
+        scrollPane.setBorder(null);
+
         add(mainPanel);
         graphPanel.add(chartPanel);
-        configPanel.add(new JScrollPane(configTable));
+        configPanel.add(scrollPane);
 
         pack();
     }

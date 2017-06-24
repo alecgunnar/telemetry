@@ -31,7 +31,10 @@ public class SerialDataSourceTest {
     private String mockPortName;
 
     @Mock
-    private LiveDataSource.Subscriber mockSubscriber;
+    private LiveDataSource.Subscriber mockSubscriberOne;
+
+    @Mock
+    private LiveDataSource.Subscriber mockSubscriberTwo;
 
     @Mock
     private IdentifierFactory mockIdFactory;
@@ -65,7 +68,7 @@ public class SerialDataSourceTest {
 
         subject = new SerialDataSource(mockPortName, mockIdFactory, mockConfigurator, mockParser);
 
-        subject.subscribe(mockSubscriber);
+        subject.subscribe(mockSubscriberOne);
     }
 
     @Test
@@ -206,7 +209,7 @@ public class SerialDataSourceTest {
 
         subject.serialEvent(mockSerialPortEvent);
 
-        verify(mockSubscriber, times(1)).receiveError("Cannot read from input stream.");
+        verify(mockSubscriberOne, times(1)).receiveError("Cannot read from input stream.");
     }
 
     @Test
@@ -235,7 +238,23 @@ public class SerialDataSourceTest {
 
         subject.serialEvent(mockSerialPortEvent);
 
-        verify(mockSubscriber, times(1)).receiveData(mockData);
+        verify(mockSubscriberOne, times(1)).receiveData(mockData);
+        verify(mockSubscriberTwo, times(1)).receiveData(mockData);
+    }
+
+    @Test
+    public void serialEvent_shouldEmitDataFromParser_givenMultipleSubscribers() throws IOException {
+        setupStartedScenario();
+
+        Map<String, Double> mockData = mock(Map.class);
+
+        when(mockParser.pushData(any())).thenReturn(mockData);
+        when(mockInputStream.available()).thenReturn(0);
+
+        subject.serialEvent(mockSerialPortEvent);
+
+        verify(mockSubscriberOne, times(1)).receiveData(mockData);
+        verify(mockSubscriberTwo, times(1)).receiveData(mockData);
     }
 
     private void setupValidScenario() {
