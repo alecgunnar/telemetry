@@ -8,6 +8,7 @@ import sunseeker.telemetry.data.parser.Parser;
 import sunseeker.telemetry.data.parser.SixteenCarParser;
 import sunseeker.telemetry.ui.LiveDataFrame;
 import sunseeker.telemetry.ui.panel.GraphPanel;
+import sunseeker.telemetry.ui.table.ConfigTable;
 
 import javax.swing.SwingUtilities;
 
@@ -27,7 +28,8 @@ public class App {
         chart.getStyler().setXAxisTicksVisible(false);
 
         GraphPanel chartPanel = new GraphPanel(chart, MAX_DATA_POINTS);
-        LiveDataFrame liveDataFrameFrame = new LiveDataFrame(chartPanel);
+        ConfigTable configTable = new ConfigTable();
+        LiveDataFrame liveDataFrameFrame = new LiveDataFrame(chartPanel, configTable);
 
         Parser parser = new SixteenCarParser();
         LiveDataSource liveDataSourceSource = new PseudoRandomDataSource(parser);
