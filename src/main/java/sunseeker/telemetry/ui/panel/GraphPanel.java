@@ -1,5 +1,6 @@
 package sunseeker.telemetry.ui.panel;
 
+import com.google.common.collect.Lists;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import sunseeker.telemetry.data.LiveDataSource;
@@ -7,6 +8,7 @@ import sunseeker.telemetry.ui.table.SummaryTable;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by aleccarpenter on 6/18/17.
@@ -16,30 +18,33 @@ public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber
 
     private final int MAX_DATA_POINTS;
 
-    private Map<String, Double> current = new HashMap<>();
-    private Map<String, List<Double>> data = new HashMap<>();
-    private final List<Double> filler = new ArrayList<>();
+    private Map<String, Double> lastValueReceived = new HashMap<>();
+    private Map<String, List<Double>> valuesDisplayedOnGraph = new HashMap<>();
+    private final List<Double> timeScaleDataValues = new ArrayList<>();
 
     public GraphPanel(XYChart chart, int maxDataPoints) {
         super(chart);
 
         this.chart = chart;
+
         MAX_DATA_POINTS = maxDataPoints;
 
         for (int i = 0; i < maxDataPoints; i++) {
-            filler.add(i + 1.0);
+            timeScaleDataValues.add(i + 1.0);
         }
 
         Thread updateChart = new Thread() {
             public void run() {
             while (true) {
-                for (String key : data.keySet()) {
-                    List<Double> values = data.get(key);
+                for (String key : valuesDisplayedOnGraph.keySet()) {
+                    List<Double> values = valuesDisplayedOnGraph.get(key);
 
-                    values.remove(0);
-                    values.add(current.get(key));
+                    values.add(lastValueReceived.get(key));
 
-                    chart.updateXYSeries(key, filler, values, null);
+                    if (values.size() > MAX_DATA_POINTS)
+                        values.remove(0);
+
+                    chart.updateXYSeries(key, timeScaleDataValues, Lists.reverse(values), null);
                 }
 
                 SwingUtilities.invokeLater(() -> {
@@ -49,9 +54,7 @@ public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber
 
                 try {
                     Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    break;
-                }
+                } catch (InterruptedException e) { break; }
             }
             }
         };
@@ -62,17 +65,13 @@ public class GraphPanel extends XChartPanel implements LiveDataSource.Subscriber
     @Override
     public void receiveData(Map<String, Double> values) {
         for (String key : values.keySet()) {
-            if (!data.containsKey(key)) {
-                List<Double> newDataList = new ArrayList<>();
-                newDataList.addAll(filler);
+            if (!valuesDisplayedOnGraph.containsKey(key))
+                valuesDisplayedOnGraph.put(key, new ArrayList<>(timeScaleDataValues));
 
-                data.put(key, newDataList);
-            }
-
-            current.put(key, values.get(key));
+            lastValueReceived.put(key, values.get(key));
 
             try {
-                chart.addSeries(key, filler, data.get(key));
+                chart.addSeries(key, timeScaleDataValues, valuesDisplayedOnGraph.get(key));
             } catch (IllegalArgumentException e) { }
         }
     }
